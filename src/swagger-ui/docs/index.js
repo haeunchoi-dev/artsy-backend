@@ -4,13 +4,14 @@ import Swagger from '../handler/swagger';
 
 import user from './api/user';
 import member from './api/member';
+import category from './api/category';
 
 class ApiDocs {
   #apiDocOption;
   #swagger;
 
   constructor() {
-    this.#apiDocOption = { ...user, ...member };
+    this.#apiDocOption = { ...user, ...member, ...category };
 
     this.#swagger = new Swagger();
   }

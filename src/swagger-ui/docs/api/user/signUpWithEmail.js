@@ -1,9 +1,9 @@
 export default {
-  '/api/user/login': {
+  '/api/user/sign-up-with-email': {
     post: {
       tags: ['User'],
-      summary: '로그인',
-      description: '로그인',
+      summary: '회원가입',
+      description: '회원가입',
       requestBody: {
         content: {
           'application/json': {
@@ -12,8 +12,8 @@ export default {
               properties: {
                 displayName: {
                   type: 'string',
-                  description: 'email',
-                  example: 'test@test.com',
+                  description: 'displayName',
+                  example: '이름 아무거나',
                 },
                 email: {
                   type: 'string',
@@ -32,20 +32,7 @@ export default {
       },
       responses: {
         200: {
-          description: '로그인 완료',
-          content: {
-            'application/json': {
-              schema: {
-                type: 'object',
-                properties: {
-                  token: {
-                    type: 'string',
-                    description: 'token',
-                  },
-                },
-              },
-            },
-          },
+          description: '회원가입 완료',
         },
       },
     },

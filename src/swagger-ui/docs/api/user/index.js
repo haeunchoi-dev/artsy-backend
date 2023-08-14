@@ -1,7 +1,11 @@
-import login from './login';
-import logout from './logout';
+import signUpWithEmail from './signUpWithEmail';
+import checkDuplicatedEmail from './checkDuplicatedEmail';
+import loginWithEmail from './loginWithEmail';
+import badge from './badge';
 
 export default {
-  ...login,
-  ...logout,
+  ...signUpWithEmail,
+  ...checkDuplicatedEmail,
+  ...loginWithEmail,
+  ...badge,
 };
