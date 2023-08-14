@@ -20,8 +20,12 @@ const swaggerTags = [
     description: 'User API',
   },
   {
-    name: 'Member',
-    description: 'Member API',
+    name: 'Category',
+    description: 'Category API',
+  },
+  {
+    name: 'User Ticket',
+    description: 'User Ticket API',
   },
 ];
 
