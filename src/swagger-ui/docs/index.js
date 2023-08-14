@@ -3,7 +3,6 @@ import swaggerJsDoc from 'swagger-jsdoc';
 import Swagger from '../handler/swagger';
 
 import user from './api/user';
-import member from './api/member';
 import category from './api/category';
 
 class ApiDocs {
@@ -11,7 +10,7 @@ class ApiDocs {
   #swagger;
 
   constructor() {
-    this.#apiDocOption = { ...user, ...member, ...category };
+    this.#apiDocOption = { ...user, ...category };
 
     this.#swagger = new Swagger();
   }
