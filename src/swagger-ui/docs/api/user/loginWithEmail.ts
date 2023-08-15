@@ -46,15 +46,15 @@ export default {
                         properties: {
                           email: {
                             type: 'string',
-                            example: 'test@test.com'
+                            example: 'test@test.com',
                           },
                           name: {
                             type: 'string',
-                            example: '이름'
+                            example: '이름',
                           },
-                        }
+                        },
                       },
-                    }
+                    },
                   },
                 },
               },
