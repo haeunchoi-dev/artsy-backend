@@ -34,9 +34,9 @@ export default {
                       isExists: {
                         type: 'boolean',
                         //description: 'true',
-                        example: true
-                      }
-                    }
+                        example: true,
+                      },
+                    },
                   },
                 },
               },
