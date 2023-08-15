@@ -1,22 +1,5 @@
 import mysql from 'mysql2';
 
-//const db_host = process.env.DATABASE_HOST;
-//const db_user = process.env.DATABASE_USER;
-//const db_pwd = process.env.DATABASE_PASSWORD;
-//const db_name = process.env.DATABASE_NAME;
-
-//if (db_host === undefined || db_user === undefined || db_pwd === undefined || db_name === undefined) {
-//  throw new Error('database info is undefiend');
-//}
-
-//const pool = mysql.createPool({
-//  host: db_host,
-//  user: db_user,
-//  password: db_pwd,
-//  database: db_name,
-//  connectionLimit: 30
-//});
-
 class Database {
   #pool = null;
 
@@ -58,7 +41,7 @@ class Database {
 
     try {
       connection = await this.#getConnection();
-      return callbackFn(connection);
+      return await callbackFn(connection);
 
     } catch (error) {
       console.error('defaultQuery', error);

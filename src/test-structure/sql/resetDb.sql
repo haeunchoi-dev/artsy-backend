@@ -1,8 +1,5 @@
-
-
-
 CREATE TABLE user (
-  id                CHAR(16) NOT NULL UNIQUE,
+  id                VARCHAR(36) DEFAULT (UUID()),
   display_name      VARCHAR(30) NOT NULL,
   email             VARCHAR(50) NOT NULL UNIQUE,
   password          VARCHAR(100),
@@ -10,8 +7,11 @@ CREATE TABLE user (
   PRIMARY KEY(id)
 ) ENGINE=MYISAM CHARSET=utf8;
 
-INSERT INTO user(id, display_name, email, password)
-VALUES('1234567890123456', '최원진', 'test1@test.com', '1234');
+INSERT INTO user(display_name, email, password) VALUES('최원진', 'test1@test.com', '1234');
+INSERT INTO user(display_name, email, password) VALUES('최하은', 'test2@test.com', '1234');
+INSERT INTO user(display_name, email, password) VALUES('송서현', 'test3@test.com', '1234');
+INSERT INTO user(display_name, email, password) VALUES('이지영', 'test4@test.com', '1234');
+INSERT INTO user(display_name, email, password) VALUES('김지윤', 'test5@test.com', '1234');
 
 
 CREATE TABLE category (
@@ -21,6 +21,12 @@ CREATE TABLE category (
   sort              TINYINT(1) NOT NULL,
   PRIMARY KEY(id)
 ) ENGINE=MYISAM CHARSET=utf8;
+
+INSERT INTO category(name, color, sort) VALUES('영화', '#8B97FF', 1);
+INSERT INTO category(name, color, sort) VALUES('뮤지컬', '#A888FF', 2);
+INSERT INTO category(name, color, sort) VALUES('전시', '#D373FA', 3);
+INSERT INTO category(name, color, sort) VALUES('콘서트', '#FFC348', 4);
+INSERT INTO category(name, color, sort) VALUES('연극', '#FFA888', 5);
 
 
 CREATE TABLE ticket (
