@@ -1,31 +1,24 @@
-interface UserServiceType {
-  siginUpWithEmail: (
-    displayName: string,
-    email: string,
-    password: string,
-  ) => Promise<any>; // 'any' 타입은 실제 반환 타입으로 교체해야 합니다.
-}
+import { Injectable } from '../decorators/di-decorator';
+import { Route } from '../decorators/route-decorator';
 
-interface UserControllerProps {
-  userService: UserServiceType;
-}
+import UserService from '../services/user-service';
+import { Request, Response } from 'express';
 
+@Injectable()
 class UserController {
-  private userService: UserServiceType;
-  constructor({ userService }: UserControllerProps) {
-    this.userService = userService;
-  }
+  constructor(private readonly service: UserService) {}
 
-  siginUpWithEmail = async (req, res) => {
+  @Route('post', '/user/sign-up-with-email')
+  async siginUpWithEmail(req: Request, res: Response) {
     const { displayName, email, password } = req.body;
 
-    const newUser = await this.userService.siginUpWithEmail(
+    const newUser = await this.service.siginUpWithEmail(
       displayName,
       email,
       password,
     );
     res.status(200).json({ success: true, artsyData: newUser });
-  };
+  }
 }
 
 export default UserController;
