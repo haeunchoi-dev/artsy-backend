@@ -3,7 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import getSwaggerOption from './swagger-ui';
 import apiRouter from './routes';
-import { ERRORS } from './error/errors.js';
+import { ERRORS } from './error/errors';
 
 const app = express();
 app.use(cors());
@@ -13,8 +13,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/api', apiRouter);
 
 //swagger 적용
-const { swaggerUI, specs, setUpoption } = getSwaggerOption();
-app.use('/api/api-docs', swaggerUI.serve, swaggerUI.setup(specs, setUpoption));
+const { swaggerUI, specs, setUpOption } = getSwaggerOption();
+app.use('/api/api-docs', swaggerUI.serve, swaggerUI.setup(specs, setUpOption));
 
 app.use((err, req, res, next) => {
   if (ERRORS[err.message]) {

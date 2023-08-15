@@ -1,5 +1,15 @@
+interface UserModelProps {
+  pool: {
+    promiseQuery: (query: string, values?: any[]) => Promise<any>;
+  };
+  uuidv4: () => string;
+}
+
 class UserModel {
-  constructor({ pool, uuidv4 }) {
+  private pool: UserModelProps['pool'];
+  private uuid: UserModelProps['uuidv4'];
+
+  constructor({ pool, uuidv4 }: UserModelProps) {
     this.pool = pool;
     this.uuid = uuidv4;
   }

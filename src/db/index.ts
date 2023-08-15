@@ -19,7 +19,7 @@ function promiseQuery(connection, query, values) {
 }
 
 function beginTransaction(connection) {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     connection.beginTransaction((err) => {
       if (err) reject(err);
       else resolve();
@@ -28,7 +28,7 @@ function beginTransaction(connection) {
 }
 
 function commit(connection) {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     connection.commit((err) => {
       if (err) reject(err);
       else resolve();
@@ -37,7 +37,7 @@ function commit(connection) {
 }
 
 function rollback(connection) {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     connection.rollback(() => {
       resolve();
     });
