@@ -17,35 +17,35 @@ export default {
                     properties: {
                       ticketCount: {
                         type: 'number',
-                        example: 15
+                        example: 15,
                       },
                       currentBadge: {
                         type: 'object',
                         properties: {
                           name: {
                             type: 'string',
-                            example: '뱃지 이름'
+                            example: '뱃지 이름',
                           },
                           standard: {
                             type: 'number',
-                            example: 10
-                          }
-                        }
+                            example: 10,
+                          },
+                        },
                       },
                       nextBadge: {
                         type: 'object',
                         properties: {
                           name: {
                             type: 'string',
-                            example: '뱃지 이름'
+                            example: '뱃지 이름',
                           },
                           standard: {
                             type: 'number',
-                            example: 30
-                          }
-                        }
+                            example: 30,
+                          },
+                        },
                       },
-                    }
+                    },
                   },
                 },
               },
