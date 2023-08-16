@@ -1,22 +1,22 @@
 import { Injectable } from '../decorators/di-decorator';
 import TicketModel from '../models/ticket-model';
 
-import { ERROR_NAMES, BaadRequestError } from '../error/errors';
+import { ITicket } from '../types/ticket';
 
 @Injectable()
 class UserTicketService {
   constructor(private readonly model: TicketModel) {}
 
-  async getTicketList(userId, categoryId) {
+  async getTicketList(userId: string, categoryId: number | null) {
     const result = await this.model.findByUserId(userId, { categoryId });
 
     return result;
   }
 
   async setTicket(
-    userId,
-    files,
-    { categoryId, title, showDate, place, price, rating, review },
+    userId: string,
+    files: any[],
+    { categoryId, title, showDate, place, price, rating, review }: ITicket,
   ) {
     const result = await this.model.create(userId, files, {
       categoryId,
@@ -31,7 +31,7 @@ class UserTicketService {
     return result;
   }
 
-  async getTicket(ticketId) {
+  async getTicket(ticketId: number) {
     const result = await this.model.findById(ticketId);
 
     return result;
