@@ -13,31 +13,6 @@ interface SuccessResponseData {
 class TestController {
   constructor(private readonly service: TestService) {}
 
-  //@Route('post', '/user/check-duplicated-email')
-  //async checkDuplicatedEmail(req: Request, res: Response) {
-  //  const { email } = req.body;
-
-  //  // TODO Checker
-
-  //  return await this.service.checkDuplicatedEmail(email);
-  //}
-
-  //@Route('post', '/user/login-with-email')
-  //async loginWithEmail(req: Request, res: Response) {
-  //  const { email, password } = req.body;
-
-  //  // TODO Checker
-
-  //  const result = await this.service.loginWithEmail(email, password);
-
-  //  const responseData: SuccessResponseData = {
-  //    success: true,
-  //    //artsyData: result.length === 0 ? null : result[0]
-  //  }
-
-  //  res.status(200).json(responseData);
-  //}
-
   //@Route('get', '/categories')
   //async getAllCategories(req: Request, res: Response) {
   //  return await this.service.getAllCategories();

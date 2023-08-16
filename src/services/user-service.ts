@@ -15,6 +15,8 @@ class UserService {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    console.log('hashedPassword', hashedPassword);
+    
     await this.userModel.create(displayName, email, hashedPassword);
   }
 
@@ -26,6 +28,30 @@ class UserService {
     }
   }
 
+  async loginWithEmail(email: string, password: string) {
+    const users = await this.userModel.findByEmail(email);
+
+    if (users.length === 0) {
+      // TODO
+      throw new Error('에러를 던질지, null을 반환할지');
+    }
+
+    const user = users[0];
+    const isCorrectPassword = await bcrypt.compare(password, user.password);
+    if (isCorrectPassword === false) {
+      // TODO
+      throw new Error('에러를 던질지, null을 반환할지');
+    }
+
+    // TODO Token and Cookie
+
+    // TODO createdDate to timestamp
+    return {
+      displayName: user.displayName,
+      email: user.email,
+      createdDate: user.createdDate
+    };
+  }
 }
 
 export default UserService;

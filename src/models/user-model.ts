@@ -10,7 +10,11 @@ class UserModel {
     // @ts-ignore
     const result = await pool.promiseQuery(
       `
-        SELECT *
+        SELECT
+          display_name as displayName,
+          email,
+          password,
+          create_date as createdDate
         FROM user
         WHERE email = ?
       `,
