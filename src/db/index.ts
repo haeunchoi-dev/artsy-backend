@@ -1,12 +1,22 @@
 import mysql from 'mysql';
 
+const sql_host = process.env.SQL_HOST;
+const sql_port = process.env.SQL_PORT;
+const sql_user = process.env.SQL_USER;
+const sql_pwd = process.env.SQL_PASSWORD;
+const sql_db = process.env.SQL_DATABASE;
+
+if (sql_host === undefined || sql_port === undefined || sql_user === undefined || sql_pwd === undefined || sql_db === undefined) {
+  throw new Error('database info is undefiend');
+}
+
 const pool = mysql.createPool({
   //   connectionLimit: 10,
-  host: 'localhost',
-  port: 3306,
-  user: 'root',
-  password: '1234',
-  database: 'artsy',
+  host: sql_host,
+  port: Number(sql_port),
+  user: sql_user,
+  password: sql_pwd,
+  database: sql_db
 });
 
 function promiseQuery(connection, query, values) {

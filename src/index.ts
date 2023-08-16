@@ -1,12 +1,14 @@
 import 'reflect-metadata';
 import 'dotenv/config';
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
+import logger from 'morgan';
 import getSwaggerOption from './swagger-ui';
 import apiRouter from './router';
 import { ERRORS } from './error/errors';
 
 const app = express();
+app.use(logger('dev'));
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -17,7 +19,9 @@ apiRouter(app);
 const { swaggerUI, specs, setUpOption } = getSwaggerOption();
 app.use('/api/api-docs', swaggerUI.serve, swaggerUI.setup(specs, setUpOption));
 
-app.use((err, req, res, next) => {
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.log('err', err);
+  
   if (ERRORS[err.message]) {
     const errorDetail = ERRORS[err.message];
     res.status(err.statusCode).send(errorDetail.message);
