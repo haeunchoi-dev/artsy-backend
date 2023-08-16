@@ -1,6 +1,8 @@
 const multer = require('multer');
 const path = require('path');
 
+// TODO
+// @ts-ignore
 const fileFilter = (req, file, callback) => {
   const typeArray = file.mimetype.split('/');
 
@@ -16,6 +18,8 @@ const fileFilter = (req, file, callback) => {
   }
 };
 
+// TODO
+// @ts-ignore
 const generateFilename = (file) => {
   console.log('multer start');
   const ext = path.extname(file.originalname); // 파일의 확장자
@@ -25,6 +29,8 @@ const generateFilename = (file) => {
 const serverRoot = path.resolve(process.cwd());
 const storage = multer.diskStorage({
   destination: serverRoot + '/views/uploads/',
+  // TODO
+  // @ts-ignore
   filename: (req, file, cb) => {
     const filename = generateFilename(file);
     cb(null, filename);
