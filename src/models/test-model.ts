@@ -5,29 +5,6 @@ import pool from '../db';
 class TestModel {
   constructor() {}
 
-  //async findByEmail(email: string) {
-  //  const result = await pool.promiseQuery(
-  //    `
-  //      SELECT *
-  //      FROM user
-  //      WHERE email = ?
-  //    `,
-  //    [email],
-  //  );
-
-  //  return result;
-  //}
-
-  //async create(displayName: string, email: string, password: string) {
-  //  await pool.promiseQuery(
-  //    `
-  //      INSERT INTO user(display_name, email, password)
-  //      VALUES (?, ?, ?);
-  //    `,
-  //    [displayName, email, password],
-  //  );
-  //}
-
   //async findByEmailAndPassword(email: string, password: string) {
   //  const result = await pool.promiseQuery(
   //    `

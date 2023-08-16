@@ -18,6 +18,14 @@ class UserService {
     await this.userModel.create(displayName, email, hashedPassword);
   }
 
+  async checkDuplicatedEmail(email: string) {
+    const users = await this.userModel.findByEmail(email);
+
+    return {
+      isExists: users.length > 0 ? true : false
+    }
+  }
+
 }
 
 export default UserService;

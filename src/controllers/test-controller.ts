@@ -13,15 +13,6 @@ interface SuccessResponseData {
 class TestController {
   constructor(private readonly service: TestService) {}
 
-  //@Route('post', '/user/sign-up-with-email')
-  //async signUpWithEmail(req: Request) {
-  //  const { displayName, email, password } = req.body;
-
-  //  // TODO Checker
-
-  //  await this.service.signUpWithEmail(displayName, email, password);
-  //}
-
   //@Route('post', '/user/check-duplicated-email')
   //async checkDuplicatedEmail(req: Request, res: Response) {
   //  const { email } = req.body;

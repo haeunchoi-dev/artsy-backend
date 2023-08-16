@@ -7,17 +7,6 @@ import { ERROR_NAMES, BaadRequestError } from '../error/errors';
 class TestService {
   constructor(private readonly testModel: TestModel) {}
 
-  //async signUpWithEmail(displayName: string, email: string, password: string) {
-  //  const users = await this.testModel.findByEmail(email);
-
-  //  if (users.length > 0) {
-  //    throw new BaadRequestError(ERROR_NAMES.EMAIL_ALREADY_EXISTS);
-  //  }
-
-  //  const hashedPassword = await bcrypt.hash(password, 10);
-  //  await this.testModel.create(displayName, email, hashedPassword);
-  //}
-
   //async checkDuplicatedEmail(email: string) {
   //  const users = await this.testModel.findByEmail(email);
 

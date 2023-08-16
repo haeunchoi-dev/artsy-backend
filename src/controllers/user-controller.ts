@@ -16,7 +16,15 @@ class UserController {
 
     await this.service.signUpWithEmail(displayName, email, password);
   }
-  
+
+  @Route('post', '/user/check-duplicated-email')
+  async checkDuplicatedEmail(req: Request, res: Response) {
+    const { email } = req.body;
+
+    // TODO Checker
+
+    return await this.service.checkDuplicatedEmail(email);
+  }
 }
 
 export default UserController;
