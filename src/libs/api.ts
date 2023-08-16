@@ -17,7 +17,7 @@ export const defaultProcess = (requestHandler: RequestHandlerType) => {
       }
 
       if (resultData !== undefined) {
-        responseData.artsyData = resultData
+        responseData.artsyData = resultData;
       }
 
       res.status(200).json(responseData);

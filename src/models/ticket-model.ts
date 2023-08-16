@@ -93,7 +93,7 @@ class TicketModel {
     });
 
     files.forEach((f) => {
-      console.log(f);
+      //console.log(f);
       queryList.push({
         query: `INSERT INTO image (ticket_id,
                 image_url,

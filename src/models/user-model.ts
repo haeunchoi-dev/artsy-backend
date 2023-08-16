@@ -11,6 +11,7 @@ class UserModel {
     const result = await pool.promiseQuery(
       `
         SELECT
+          id,
           display_name as displayName,
           email,
           password,
