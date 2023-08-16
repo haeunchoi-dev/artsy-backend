@@ -7,7 +7,7 @@ import category from './api/category';
 
 class ApiDocs {
   #apiDocOption;
-  #swagger;
+  #swagger: Swagger;
 
   constructor() {
     this.#apiDocOption = { ...user, ...category };
@@ -20,14 +20,14 @@ class ApiDocs {
   }
 
   getSwaggerOption() {
-    const { apiOption, setUpoption } = this.#swagger.getOption();
+    const { apiOption, setUpOption } = this.#swagger.getOption();
 
     const specs = swaggerJsDoc(apiOption);
 
     return {
       swaggerUI,
       specs,
-      setUpoption,
+      setUpOption,
     };
   }
 }

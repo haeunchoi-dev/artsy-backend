@@ -27,10 +27,10 @@ export default {
                         },
                         color: {
                           type: 'string',
-                          example: '#ff0000'
-                        }
-                      }
-                    }
+                          example: '#ff0000',
+                        },
+                      },
+                    },
                   },
                 },
               },

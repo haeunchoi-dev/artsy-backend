@@ -29,11 +29,33 @@ const swaggerTags = [
   },
 ];
 
+interface SwaggerDefinition {
+  openapi: string;
+  info: {
+    title: string;
+    version: string;
+    description: string;
+  };
+  servers: { url: string }[];
+  produces: string[];
+  tags: { name: string; description: string }[];
+  paths?: { [key: string]: any };
+}
+
+interface SwaggerOption {
+  definition?: SwaggerDefinition;
+  apis?: [];
+}
+
+interface SwaggerSetUpOption {
+  explorer?: boolean;
+}
+
 class Swagger {
   static #uniqueSwaggerInstance;
   #paths = [{}];
-  #option = {};
-  #setUpOption = {};
+  #option: SwaggerOption = {};
+  #setUpOption: SwaggerSetUpOption = {};
 
   /**
    *
@@ -59,7 +81,6 @@ class Swagger {
       apis: [],
     };
     this.#setUpOption = {
-      // search
       explorer: true,
     };
   }
@@ -80,7 +101,7 @@ class Swagger {
     return path;
   }
 
-  getOption() {
+  getOption(): { apiOption: SwaggerOption; setUpOption: SwaggerSetUpOption } {
     const path = this.#processAPI();
     this.#option.definition.paths = path;
 
