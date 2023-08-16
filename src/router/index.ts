@@ -26,7 +26,6 @@ function registerRoutes(controller: any) {
   }
 }
 
-
 export default (app: express.Application) => {
   const userController = container.resolve<UserController>(UserController.name);
   const userTicketController = container.resolve<UserTicketController>(
@@ -39,5 +38,6 @@ export default (app: express.Application) => {
   registerRoutes(userTicketController);
   registerRoutes(categoryController);
 
-  app.use('/api', router);
+  const root = process.env.ROOT || '/api';
+  app.use(root, router);
 };
