@@ -18,8 +18,15 @@ class UserTicketController {
     //const userId = req.currentUserId || ''
     const userId = '1';
     const { categoryId } = req.query;
-    const ticketList = await this.service.getTicketList(userId, categoryId);
-    res.status(200).json({ success: true, artsyData: ticketList });
+
+    //TODO
+    //string to number
+
+    const ticketList = await this.service.getTicketList(
+      userId,
+      categoryId ? Number(categoryId) : null,
+    );
+    return ticketList;
   }
 
   @Route('post', '/user/ticket', upload.array('file'))
@@ -30,34 +37,30 @@ class UserTicketController {
 
     const { categoryId, title, showDate, place, price, rating, review } =
       req.body;
-    console.log({
-      categoryId,
+
+    //TODO
+    // string to number
+
+    return await this.service.setTicket(userId, files, {
+      categoryId: Number(categoryId),
       title,
       showDate,
       place,
-      price,
-      rating,
-      review,
-      files,
-    });
-    await this.service.setTicket(userId, files, {
-      categoryId,
-      title,
-      showDate,
-      place,
-      price,
-      rating,
+      price: Number(price),
+      rating: Number(rating),
       review,
     });
-    res.status(201).json({ success: true });
   }
 
   @Route('get', '/user/ticket/:ticketId')
   async getTicket(req: Request, res: Response) {
     const { ticketId } = req.params;
 
-    const ticket = await this.service.getTicket(ticketId);
-    res.status(200).json({ success: true, artsyData: ticket });
+    //TODO
+    //string to number
+
+    const ticket = await this.service.getTicket(Number(ticketId));
+    return ticket;
   }
 }
 
