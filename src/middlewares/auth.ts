@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 
 export enum UserType {
   user = 'user',
-  admin = 'admin'
+  admin = 'admin',
 }
 
 export default function auth(userType: UserType) {
@@ -29,7 +29,7 @@ export default function auth(userType: UserType) {
         //throw createAppError(ERROR_CODE.internalServerError, 'internalServerError', 'auth error - undefined user type');
       }
     }
-  }
+  };
 }
 
 //function authNonUser(req, next) {
@@ -49,16 +49,18 @@ function authMember(req: Request, next: NextFunction) {
   }
 
   try {
-    const userInfo = jwt.verify(loginToken, process.env.TOKEN_SECRET_KEY) as { userId: string };
+    const userInfo = jwt.verify(
+      loginToken,
+      process.env.TOKEN_SECRET_KEY || 'artsy-secret-key',
+    ) as { userId: string };
     req.params.userId = userInfo.userId;
     next();
-
   } catch (error) {
-    if (error.name === "TokenExpiredError") {
+    if (error.name === 'TokenExpiredError') {
       // TODO
       throw new Error('에러 관리');
       //throw createAppError(ERROR_CODE.unauthorized, 'unauthorized', 'only access member - token expired');
-    } else if (error.name === "JsonWebTokenError") {
+    } else if (error.name === 'JsonWebTokenError') {
       // TODO
       throw new Error('에러 관리');
       //throw createAppError(ERROR_CODE.unauthorized, 'unauthorized', 'only access member - invalid token');

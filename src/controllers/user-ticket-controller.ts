@@ -1,6 +1,7 @@
 import { Injectable } from '../decorators/di-decorator';
 import { Route } from '../decorators/route-decorator';
 
+import auth, { UserType } from '../middlewares/auth';
 import upload from '../middlewares/multer';
 import UserTicketService from '../services/user-ticket-service';
 import { Request, Response } from 'express';
@@ -13,10 +14,9 @@ interface FileRequest extends Request {
 class UserTicketController {
   constructor(private readonly service: UserTicketService) {}
 
-  @Route('get', '/user/tickets')
+  @Route('get', '/user/tickets', auth(UserType.user))
   async getTicketList(req: Request, res: Response) {
-    //const userId = req.currentUserId || ''
-    const userId = '1';
+    const userId = req.params.userId;
     const { categoryId } = req.query;
 
     //TODO
@@ -29,10 +29,10 @@ class UserTicketController {
     return ticketList;
   }
 
-  @Route('post', '/user/ticket', upload.array('file'))
+  @Route('post', '/user/ticket', auth(UserType.user), upload.array('file'))
   async setTicket(req: FileRequest, res: Response) {
     //TODP:body check
-    const userId = '1';
+    const userId = req.params.userId;
     const files = req.files || [];
 
     const { categoryId, title, showDate, place, price, rating, review } =
@@ -52,7 +52,7 @@ class UserTicketController {
     });
   }
 
-  @Route('get', '/user/ticket/:ticketId')
+  @Route('get', '/user/ticket/:ticketId', auth(UserType.user))
   async getTicket(req: Request, res: Response) {
     const { ticketId } = req.params;
 
@@ -63,19 +63,17 @@ class UserTicketController {
     return ticket;
   }
 
-  @Route('get', '/user/ticket-total-count')
+  @Route('get', '/user/ticket-total-count', auth(UserType.user))
   async getTicketTotalCount(req: Request, res: Response) {
-    //const userId = req.currentUserId || ''
-    const userId = '1';
+    const userId = req.params.userId;
 
     // TODO Checker
     return await this.service.getTicketTotalCount(userId);
   }
 
-  @Route('get', '/user/ticket-total-price')
+  @Route('get', '/user/ticket-total-price', auth(UserType.user))
   async getTicketTotalPrice(req: Request, res: Response) {
-    //const userId = req.currentUserId || ''
-    const userId = '1';
+    const userId = req.params.userId;
 
     // TODO Checker
     return await this.service.getTicketTotalPrice(userId);
