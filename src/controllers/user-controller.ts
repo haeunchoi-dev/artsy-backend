@@ -9,16 +9,14 @@ class UserController {
   constructor(private readonly service: UserService) {}
 
   @Route('post', '/user/sign-up-with-email')
-  async siginUpWithEmail(req: Request, res: Response) {
+  async signUpWithEmail(req: Request, res: Response) {
     const { displayName, email, password } = req.body;
 
-    const newUser = await this.service.siginUpWithEmail(
-      displayName,
-      email,
-      password,
-    );
-    res.status(200).json({ success: true, artsyData: newUser });
+    // TODO Checker
+
+    await this.service.signUpWithEmail(displayName, email, password);
   }
+  
 }
 
 export default UserController;

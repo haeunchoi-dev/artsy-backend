@@ -52,7 +52,7 @@ interface SwaggerSetUpOption {
 }
 
 class Swagger {
-  static #uniqueSwaggerInstance;
+  static #uniqueSwaggerInstance: Swagger;
   #paths = [{}];
   #option: SwaggerOption = {};
   #setUpOption: SwaggerSetUpOption = {};
@@ -74,6 +74,8 @@ class Swagger {
       definition: {
         openapi: swaggerOpenApiVersion,
         info: swaggerInfo,
+        // TODO
+        // @ts-ignore
         servers: swaggerServers,
         produces: swaggerProduces,
         tags: swaggerTags,
@@ -85,6 +87,8 @@ class Swagger {
     };
   }
 
+  // TODO
+  // @ts-ignore
   addAPI(api) {
     this.#paths.push(api);
   }
@@ -94,6 +98,8 @@ class Swagger {
 
     for (let i = 0; i < this.#paths.length; i += 1) {
       for (const [key, value] of Object.entries(this.#paths[i])) {
+        // TODO
+        // @ts-ignore
         path[key] = value;
       }
     }
@@ -103,6 +109,8 @@ class Swagger {
 
   getOption(): { apiOption: SwaggerOption; setUpOption: SwaggerSetUpOption } {
     const path = this.#processAPI();
+    // TODO
+    // @ts-ignore
     this.#option.definition.paths = path;
 
     return {

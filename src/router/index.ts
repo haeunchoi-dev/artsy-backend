@@ -3,7 +3,6 @@ import { defaultProcess } from '../libs/api';
 
 import express from 'express';
 import UserController from '../controllers/user-controller';
-import TestController from '../controllers/test-controller';
 
 const router = express.Router();
 function registerRoutes(controller: any) {
@@ -14,6 +13,8 @@ function registerRoutes(controller: any) {
       const route = Reflect.getMetadata('route', prototype, propertyName);
 
       if (route) {
+        // TODO
+        // @ts-ignore
         router[route.method](
           route.path,
           defaultProcess(prototype[propertyName].bind(controller)),
@@ -24,11 +25,9 @@ function registerRoutes(controller: any) {
 }
 
 const userController = container.resolve<UserController>(UserController.name);
-const testController = container.resolve<TestController>(TestController.name);
 
 export default (app: express.Application) => {
   registerRoutes(userController);
-  registerRoutes(testController);
-  
+
   app.use('/api', router);
 };

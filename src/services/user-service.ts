@@ -7,22 +7,17 @@ import { ERROR_NAMES, BaadRequestError } from '../error/errors';
 class UserService {
   constructor(private readonly userModel: UserModel) {}
 
-  async siginUpWithEmail(displayName, email, password) {
-    const user = await this.userModel.findByEmail(email);
+  async signUpWithEmail(displayName: string, email: string, password: string) {
+    const users = await this.userModel.findByEmail(email);
 
-    if (user.length > 0) {
+    if (users.length > 0) {
       throw new BaadRequestError(ERROR_NAMES.EMAIL_ALREADY_EXISTS);
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const createdNewUser = await this.userModel.create(
-      displayName,
-      email,
-      hashedPassword,
-    );
-
-    return createdNewUser;
+    await this.userModel.create(displayName, email, hashedPassword);
   }
+
 }
 
 export default UserService;

@@ -19,8 +19,12 @@ const pool = mysql.createPool({
   database: sql_db
 });
 
+// TODO
+// @ts-ignore
 function promiseQuery(connection, query, values) {
   return new Promise((resolve, reject) => {
+    // TODO
+    // @ts-ignore
     connection.query(query, values, (error, results) => {
       if (error) reject(error);
       else resolve(results);
@@ -28,8 +32,12 @@ function promiseQuery(connection, query, values) {
   });
 }
 
+// TODO
+// @ts-ignore
 function beginTransaction(connection) {
   return new Promise<void>((resolve, reject) => {
+    // TODO
+    // @ts-ignore
     connection.beginTransaction((err) => {
       if (err) reject(err);
       else resolve();
@@ -37,8 +45,12 @@ function beginTransaction(connection) {
   });
 }
 
+// TODO
+// @ts-ignore
 function commit(connection) {
   return new Promise<void>((resolve, reject) => {
+    // TODO
+    // @ts-ignore
     connection.commit((err) => {
       if (err) reject(err);
       else resolve();
@@ -46,6 +58,8 @@ function commit(connection) {
   });
 }
 
+// TODO
+// @ts-ignore
 function rollback(connection) {
   return new Promise<void>((resolve, reject) => {
     connection.rollback(() => {
@@ -54,6 +68,8 @@ function rollback(connection) {
   });
 }
 
+// TODO
+// @ts-ignore
 pool.promiseQuery = function (sql, values) {
   return new Promise((resolve, reject) => {
     pool.query(sql, values, (error, results) => {
@@ -65,6 +81,9 @@ pool.promiseQuery = function (sql, values) {
     });
   });
 };
+
+// TODO
+// @ts-ignore
 pool.executeMultipleQueriesInTransaction = function (queriesWithValues) {
   return new Promise((resolve, reject) => {
     console.log('Transaction start.');
