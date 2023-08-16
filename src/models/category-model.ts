@@ -18,6 +18,21 @@ class CategoryModel {
 
     return result;
   }
+
+  async getCategory(categoryId: number) {
+    // TODO
+    // @ts-ignore
+    const result = await pool.promiseQuery(
+      `
+        SELECT *
+        FROM category
+        WHERE id = ?
+      `,
+      [categoryId]
+    );
+
+    return result;
+  }
 }
 
 export default CategoryModel;

@@ -5,19 +5,6 @@ import pool from '../db';
 class TestModel {
   constructor() {}
 
-  //async getCategory(categoryId: number) {
-  //  const result = await pool.promiseQuery(
-  //    `
-  //      SELECT *
-  //      FROM category
-  //      WHERE id = ?
-  //    `,
-  //    [categoryId]
-  //  );
-
-  //  return result;
-  //}
-
   //async getTicketsTotalCount(userId: string) {
   //  const result = await pool.promiseQuery(
   //    `

@@ -13,17 +13,6 @@ interface SuccessResponseData {
 class TestController {
   constructor(private readonly service: TestService) {}
 
-  //@Route('get', '/categories/:categoryId')
-  //async getCategory(req: Request, res: Response) {
-  //  const { categoryId } = req.params;
-  //  console.log('categoryId', categoryId);
-
-  //  // TODO Checker
-  //  // TODO String to Number
-
-  //  return await this.service.getCategory(Number(categoryId));
-  //}
-
   //@Route('get', '/tickets/total-count')
   //async getTicketsTotalCount(req: Request, res: Response) {
   //  // TODO get userId from token
