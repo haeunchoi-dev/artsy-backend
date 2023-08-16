@@ -1,8 +1,10 @@
+import { Request, Response } from 'express';
+
 import { Injectable } from '../decorators/di-decorator';
 import { Route } from '../decorators/route-decorator';
+import auth, { UserType } from '../middlewares/auth';
 
 import UserService from '../services/user-service';
-import { Request, Response } from 'express';
 
 @Injectable()
 class UserController {
@@ -32,7 +34,13 @@ class UserController {
 
     // TODO Checker
 
-    return await this.service.loginWithEmail(email, password);
+    const result = await this.service.loginWithEmail(email, password);
+
+    res.cookie('loginToken', result.token, { expires: new Date(Date.now() + 3600000) });
+
+    return {
+      ...result.userInfo
+    }
   }
 }
 

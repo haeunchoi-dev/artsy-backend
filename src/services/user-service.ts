@@ -1,7 +1,10 @@
-import { Injectable } from '../decorators/di-decorator';
-import UserModel from '../models/user-model';
+import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
+
+import { Injectable } from '../decorators/di-decorator';
 import { ERROR_NAMES, BaadRequestError } from '../error/errors';
+
+import UserModel from '../models/user-model';
 
 @Injectable()
 class UserService {
@@ -15,8 +18,6 @@ class UserService {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log('hashedPassword', hashedPassword);
-    
     await this.userModel.create(displayName, email, hashedPassword);
   }
 
@@ -44,12 +45,22 @@ class UserService {
     }
 
     // TODO Token and Cookie
+    const secretKey = process.env.TOKEN_SECRET_KEY;
+    if (secretKey === undefined) {
+      // TODO 에러관리
+      throw new Error('토큰 에러');
+    }
+
+    const token = jwt.sign({ userId: user.id }, secretKey);
 
     // TODO createdDate to timestamp
     return {
-      displayName: user.displayName,
-      email: user.email,
-      createdDate: user.createdDate
+      token: token,
+      userInfo: {
+        displayName: user.displayName,
+        email: user.email,
+        createdDate: user.createdDate
+      }
     };
   }
 }
