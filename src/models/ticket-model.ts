@@ -170,6 +170,32 @@ class TicketModel {
 
     return ticket;
   }
+
+  async totalCountByUserId(userId: string) {
+    // TODO
+    // @ts-ignore
+    const result = await pool.promiseQuery(
+      `SELECT   count(id) as total
+                FROM ticket 
+                WHERE user_id = ?`,
+      [userId],
+    );
+
+    return result;
+  }
+
+  async totalPriceByUserId(userId: string) {
+    // TODO
+    // @ts-ignore
+    const result = await pool.promiseQuery(
+      `SELECT   sum(price) as totalPrice
+                FROM ticket 
+                WHERE user_id = ?`,
+      [userId],
+    );
+
+    return result;
+  }
 }
 
 export default TicketModel;

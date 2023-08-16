@@ -36,6 +36,14 @@ class UserTicketService {
 
     return result;
   }
+
+  async getTicketTotalCount(userId: string) {
+    return await this.model.totalCountByUserId(userId);
+  }
+
+  async getTicketTotalPrice(userId: string) {
+    return await this.model.totalPriceByUserId(userId);
+  }
 }
 
 export default UserTicketService;

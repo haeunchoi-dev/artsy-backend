@@ -3,7 +3,6 @@ import checkDuplicatedEmail from './checkDuplicatedEmail';
 import loginWithEmail from './loginWithEmail';
 import tickets from './tickets';
 import ticket from './ticket';
-import price from './price';
 
 export default {
   ...signUpWithEmail,
@@ -11,5 +10,4 @@ export default {
   ...loginWithEmail,
   ...tickets,
   ...ticket,
-  ...price,
 };

@@ -234,4 +234,65 @@ export default {
       },
     },
   },
+  '/api/user/ticket-total-count': {
+    get: {
+      tags: ['User Ticket'],
+      summary: '티켓 수 조회',
+      description: '티켓 수 조회',
+      responses: {
+        200: {
+          description: '티켓 수',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  artsyData: {
+                    type: 'object',
+                    properties: {
+                      total: {
+                        type: 'int',
+                        description: '티켓 총 수',
+                        example: 10,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  '/api/user/ticket-total-price': {
+    get: {
+      tags: ['User Ticket'],
+      summary: '총 지출 정보',
+      description: '총 지출 정보',
+      responses: {
+        200: {
+          description: '총 지출 정보',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  artsyData: {
+                    type: 'object',
+                    properties: {
+                      totalPrice: {
+                        type: 'number',
+                        example: 1000000,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
 };
