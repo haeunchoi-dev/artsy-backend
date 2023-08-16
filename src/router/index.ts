@@ -4,6 +4,7 @@ import { defaultProcess } from '../libs/api';
 import express from 'express';
 import UserController from '../controllers/user-controller';
 import UserTicketController from '../controllers/user-ticket-controller';
+import CategoryController from '../controllers/category-controller';
 
 const router = express.Router();
 function registerRoutes(controller: any) {
@@ -31,8 +32,12 @@ export default (app: express.Application) => {
   const userTicketController = container.resolve<UserTicketController>(
     UserTicketController.name,
   );
+  const categoryController = container.resolve<CategoryController>(
+    CategoryController.name,
+  );
   registerRoutes(userController);
   registerRoutes(userTicketController);
+  registerRoutes(categoryController);
 
   app.use('/api', router);
 };

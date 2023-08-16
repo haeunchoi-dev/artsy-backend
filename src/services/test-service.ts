@@ -7,11 +7,6 @@ import { ERROR_NAMES, BaadRequestError } from '../error/errors';
 class TestService {
   constructor(private readonly testModel: TestModel) {}
 
-  //async getAllCategories() {
-  //  const categories = await this.testModel.getAllCategories();
-  //  return categories;
-  //}
-
   //async getCategory(categoryId: number) {
   //  const categories = await this.testModel.getCategory(categoryId);
 

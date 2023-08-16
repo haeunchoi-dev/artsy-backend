@@ -13,11 +13,6 @@ interface SuccessResponseData {
 class TestController {
   constructor(private readonly service: TestService) {}
 
-  //@Route('get', '/categories')
-  //async getAllCategories(req: Request, res: Response) {
-  //  return await this.service.getAllCategories();
-  //}
-
   //@Route('get', '/categories/:categoryId')
   //async getCategory(req: Request, res: Response) {
   //  const { categoryId } = req.params;
