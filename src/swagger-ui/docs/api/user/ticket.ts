@@ -6,7 +6,7 @@ export default {
       description: '티켓 생성',
       requestBody: {
         content: {
-          'application/json': {
+          'multipart/form-data': {
             schema: {
               type: 'object',
               properties: {
@@ -44,6 +44,13 @@ export default {
                   type: 'string',
                   description: '리뷰',
                   example: '오늘 영화봄',
+                },
+                file: {
+                  type: 'array',
+                  items: {
+                    type: 'string',
+                    format: 'binary',
+                  },
                 },
               },
             },
