@@ -62,6 +62,24 @@ class UserTicketController {
     const ticket = await this.service.getTicket(Number(ticketId));
     return ticket;
   }
+
+  @Route('get', '/user/ticket-total-count')
+  async getTicketTotalCount(req: Request, res: Response) {
+    //const userId = req.currentUserId || ''
+    const userId = '1';
+
+    // TODO Checker
+    return await this.service.getTicketTotalCount(userId);
+  }
+
+  @Route('get', '/user/ticket-total-price')
+  async getTicketTotalPrice(req: Request, res: Response) {
+    //const userId = req.currentUserId || ''
+    const userId = '1';
+
+    // TODO Checker
+    return await this.service.getTicketTotalPrice(userId);
+  }
 }
 
 export default UserTicketController;
