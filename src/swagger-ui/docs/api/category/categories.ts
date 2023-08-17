@@ -12,6 +12,10 @@ export default {
               schema: {
                 type: 'object',
                 properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
                   artsyData: {
                     type: 'array',
                     items: {
@@ -63,6 +67,10 @@ export default {
               schema: {
                 type: 'object',
                 properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
                   artsyData: {
                     type: 'object',
                     properties: {
@@ -76,9 +84,9 @@ export default {
                       },
                       color: {
                         type: 'string',
-                        example: '#ff0000'
-                      }
-                    }
+                        example: '#ff0000',
+                      },
+                    },
                   },
                 },
               },
