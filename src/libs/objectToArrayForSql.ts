@@ -9,13 +9,13 @@ function objectToArray(obj: any) {
   let filterValue = [];
 
   for (const [key, value] of Object.entries(obj)) {
-    // TODO
-    // @ts-ignore
-    if (!isEmpty(value)) {
-      let newKey = camelToSnakeCase(key);
-      filterKey.push(newKey);
-      filterValue.push(value);
+    if (isEmpty(value)) {
+      continue;
     }
+
+    let newKey = camelToSnakeCase(key);
+    filterKey.push(newKey);
+    filterValue.push(value);
   }
 
   return { filterKey, filterValue };

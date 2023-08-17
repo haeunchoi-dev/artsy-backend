@@ -1,4 +1,5 @@
 import { container } from '../decorators/di-decorator';
+import { IRoute } from '../decorators/route-decorator';
 import { defaultProcess } from '../libs/api';
 
 import express from 'express';
@@ -7,15 +8,18 @@ import UserTicketController from '../controllers/user-ticket-controller';
 import CategoryController from '../controllers/category-controller';
 
 const router = express.Router();
+
 function registerRoutes(controller: any) {
   const prototype = Object.getPrototypeOf(controller);
   const propertyNames = Object.getOwnPropertyNames(prototype);
   for (const propertyName of propertyNames) {
     if (propertyName !== 'constructor') {
-      const route = Reflect.getMetadata('route', prototype, propertyName);
+      const route: IRoute = Reflect.getMetadata(
+        'route',
+        prototype,
+        propertyName,
+      );
       if (route) {
-        // TODO
-        // @ts-ignore
         router[route.method](
           route.path,
           ...route.middlewares,

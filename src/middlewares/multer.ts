@@ -1,9 +1,11 @@
-import multer from 'multer';
+import multer, { FileFilterCallback } from 'multer';
 import path from 'path';
 
-// TODO
-// @ts-ignore
-const fileFilter = (req, file, callback) => {
+const fileFilter = (
+  req: Express.Request,
+  file: Express.Multer.File,
+  callback: FileFilterCallback,
+) => {
   const typeArray = file.mimetype.split('/');
 
   const fileType = typeArray[1];
@@ -11,17 +13,12 @@ const fileFilter = (req, file, callback) => {
   if (fileType == 'jpg' || fileType == 'jpeg' || fileType == 'png') {
     callback(null, true);
   } else {
-    return callback(
-      { message: '*.jpg, *.jpeg, *.png 파일만 업로드가 가능합니다.' },
-      false,
-    );
+    callback(null, false);
+    new Error('*.jpg, *.jpeg, *.png 파일만 업로드가 가능합니다.');
   }
 };
 
-// TODO
-// @ts-ignore
-const generateFilename = (file) => {
-  console.log('multer start');
+const generateFilename = (file: Express.Multer.File) => {
   const ext = path.extname(file.originalname); // 파일의 확장자
   return path.basename(file.originalname, ext) + Date.now() + ext;
 };
@@ -29,8 +26,6 @@ const generateFilename = (file) => {
 const serverRoot = path.resolve(process.cwd());
 const storage = multer.diskStorage({
   destination: serverRoot + '/views/uploads/',
-  // TODO
-  // @ts-ignore
   filename: (req, file, cb) => {
     const filename = generateFilename(file);
     cb(null, filename);
