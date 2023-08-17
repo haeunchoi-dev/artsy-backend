@@ -16,12 +16,11 @@ class Checker {
     }
   }
 
-  //#requiredPositiveInteger(num, errorLog) {
-  //  if (typeof num !== 'number' || !Number.isInteger(num) || num < 1) {
-  //    console.error(errorLog);
-  //    this.#throwBadRequestAppError();
-  //  }
-  //}
+  private requiredPositiveInteger(value: any, errorLog: string) {
+    if (typeof value !== 'number' || !Number.isInteger(value) || value < 1) {
+      this.throwBadRequestError(errorLog);
+    }
+  }
 
   //#requiredArray(arr, errorLog) {
   //  if (!Array.isArray(arr) || arr.length === 0) {
@@ -77,12 +76,12 @@ class Checker {
   //  }
   //}
 
-  //checkRequiredPositiveIntegerParams() {
-  //  for (let i = 0; i < arguments.length; i++) {
-  //    const param = arguments[i];
-  //    this.#requiredPositiveInteger(Number(param), `Fail - checkRequiredPositiveIntegerParams : ${i}`);
-  //  }
-  //}
+  checkRequiredPositiveIntegerParams(...args: any[]) {
+    for (let i = 0; i < args.length; i++) {
+      const param = args[i];
+      this.requiredPositiveInteger(Number(param), `Fail - checkRequiredPositiveIntegerParams : ${i}`);
+    }
+  }
 
   //checkOptionalStringParams() {
   //  for (let i = 0; i < arguments.length; i++) {
