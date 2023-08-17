@@ -1,8 +1,10 @@
+import { Request, Response } from 'express';
+
 import { Injectable } from '../decorators/di-decorator';
 import { Route } from '../decorators/route-decorator';
+import checker from '../libs/checker';
 
 import CategoryService from '../services/category-service';
-import { Request, Response } from 'express';
 
 @Injectable()
 class CategoryController {
@@ -17,8 +19,7 @@ class CategoryController {
   async getCategory(req: Request, res: Response) {
     const { categoryId } = req.params;
 
-    // TODO Checker
-    // TODO String to Number
+    checker.checkRequiredPositiveIntegerParams(Number(categoryId));
 
     return await this.service.getCategory(Number(categoryId));
   }

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 
 import { Injectable } from '../decorators/di-decorator';
 import { Route } from '../decorators/route-decorator';
-import auth, { UserType } from '../middlewares/auth';
+import checker from '../libs/checker';
 
 import UserService from '../services/user-service';
 
@@ -14,7 +14,8 @@ class UserController {
   async signUpWithEmail(req: Request, res: Response) {
     const { displayName, email, password } = req.body;
 
-    // TODO Checker
+    checker.checkEmailFormat(email);
+    checker.checkRequiredStringParams(displayName, password);
 
     await this.service.signUpWithEmail(displayName, email, password);
   }
@@ -23,7 +24,7 @@ class UserController {
   async checkDuplicatedEmail(req: Request, res: Response) {
     const { email } = req.body;
 
-    // TODO Checker
+    checker.checkEmailFormat(email);
 
     return await this.service.checkDuplicatedEmail(email);
   }
@@ -32,7 +33,8 @@ class UserController {
   async loginWithEmail(req: Request, res: Response) {
     const { email, password } = req.body;
 
-    // TODO Checker
+    checker.checkEmailFormat(email);
+    checker.checkRequiredStringParams(password);
 
     const result = await this.service.loginWithEmail(email, password);
 
