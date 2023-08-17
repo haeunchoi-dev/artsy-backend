@@ -33,26 +33,24 @@ export default {
               schema: {
                 type: 'object',
                 properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
                   artsyData: {
                     type: 'object',
                     properties: {
-                      token: {
+                      displayName: {
                         type: 'string',
-                        description: 'token',
-                        example: '###',
+                        example: '이름',
                       },
-                      userInfo: {
-                        type: 'object',
-                        properties: {
-                          email: {
-                            type: 'string',
-                            example: 'test@test.com',
-                          },
-                          name: {
-                            type: 'string',
-                            example: '이름',
-                          },
-                        },
+                      email: {
+                        type: 'string',
+                        example: 'test@test.com',
+                      },
+                      createDate: {
+                        type: 'timestemp',
+                        example: '2023-08-15T23:43:20.000Z',
                       },
                     },
                   },

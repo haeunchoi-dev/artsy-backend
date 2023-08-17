@@ -33,6 +33,19 @@ export default {
       responses: {
         200: {
           description: '회원가입 완료',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
+                },
+              },
+            },
+          },
         },
       },
     },
