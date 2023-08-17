@@ -1,3 +1,5 @@
+import { ISwaggerOption } from './type';
+
 const swaggerOpenApiVersion = '3.0.0';
 
 const swaggerInfo = {
@@ -10,7 +12,7 @@ const swaggerProduces = ['application/json'];
 
 const swaggerServers = [
   {
-    url: process.env.SWAGGER_ID_URL,
+    url: process.env.SWAGGER_ID_URL || 'http://localhost:5000',
   },
 ];
 
@@ -29,33 +31,11 @@ const swaggerTags = [
   },
 ];
 
-interface SwaggerDefinition {
-  openapi: string;
-  info: {
-    title: string;
-    version: string;
-    description: string;
-  };
-  servers: { url: string }[];
-  produces: string[];
-  tags: { name: string; description: string }[];
-  paths?: { [key: string]: any };
-}
-
-interface SwaggerOption {
-  definition?: SwaggerDefinition;
-  apis?: [];
-}
-
-interface SwaggerSetUpOption {
-  explorer?: boolean;
-}
-
 class Swagger {
   static #uniqueSwaggerInstance: Swagger;
   #paths = [{}];
-  #option: SwaggerOption = {};
-  #setUpOption: SwaggerSetUpOption = {};
+  #option: ISwaggerOption = {};
+  #setUpOption = {};
 
   /**
    *
@@ -74,8 +54,7 @@ class Swagger {
       definition: {
         openapi: swaggerOpenApiVersion,
         info: swaggerInfo,
-        // TODO
-        // @ts-ignore
+
         servers: swaggerServers,
         produces: swaggerProduces,
         tags: swaggerTags,
@@ -87,19 +66,15 @@ class Swagger {
     };
   }
 
-  // TODO
-  // @ts-ignore
-  addAPI(api) {
+  addAPI(api: any) {
     this.#paths.push(api);
   }
 
   #processAPI() {
-    const path = {};
+    const path: Record<string, any> = {};
 
     for (let i = 0; i < this.#paths.length; i += 1) {
       for (const [key, value] of Object.entries(this.#paths[i])) {
-        // TODO
-        // @ts-ignore
         path[key] = value;
       }
     }
@@ -107,11 +82,10 @@ class Swagger {
     return path;
   }
 
-  getOption(): { apiOption: SwaggerOption; setUpOption: SwaggerSetUpOption } {
+  getOption() {
     const path = this.#processAPI();
-    // TODO
-    // @ts-ignore
-    this.#option.definition.paths = path;
+
+    this.#option.definition!.paths = path;
 
     return {
       apiOption: this.#option,
