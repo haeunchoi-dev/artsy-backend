@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 
-import { Injectable } from '../decorators/di-decorator';
-import { Route } from '../decorators/route-decorator';
-import checker from '../libs/checker';
+import { Injectable } from '@/decorators/di-decorator';
+import { Route } from '@/decorators/route-decorator';
+import checker from '@/libs/checker';
 
-import UserService from '../services/user-service';
+import UserService from '@/services/user-service';
 
 @Injectable()
 class UserController {

@@ -1,5 +1,5 @@
-import { Injectable } from '../decorators/di-decorator';
-import pool from '../db';
+import { Injectable } from '@/decorators/di-decorator';
+import pool from '@/db';
 
 @Injectable()
 class UserModel {

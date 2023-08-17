@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 
-import { Injectable } from '../decorators/di-decorator';
-import { Route } from '../decorators/route-decorator';
-import checker from '../libs/checker';
+import { Injectable } from '@/decorators/di-decorator';
+import { Route } from '@/decorators/route-decorator';
+import checker from '@/libs/checker';
 
-import CategoryService from '../services/category-service';
+import CategoryService from '@/services/category-service';
 
 @Injectable()
 class CategoryController {

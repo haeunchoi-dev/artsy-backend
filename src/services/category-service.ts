@@ -1,6 +1,7 @@
-import { Injectable } from '../decorators/di-decorator';
-import CategoryModel from '../models/category-model';
-//import { ERROR_NAMES, BaadRequestError } from '../error/errors';
+import { Injectable } from '@/decorators/di-decorator';
+import { ERROR_NAMES, BadRequestError } from '@/error/errors';
+
+import CategoryModel from '@/models/category-model';
 
 @Injectable()
 class CategoryService {
@@ -14,8 +15,7 @@ class CategoryService {
     const categories = await this.categoryModel.getCategory(categoryId);
 
     if (categories.length === 0) {
-      // TODO
-      throw new Error('에러를 던질지, null을 반환할지');
+      throw new BadRequestError(ERROR_NAMES.INVALID_PARAM, 'getCategory - categories.length === 0');
     }
 
     return categories[0];

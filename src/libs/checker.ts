@@ -1,13 +1,9 @@
-//const { ERROR_CODE, createAppError } = require('./appErrorMaker');
-//const { EnumOrderStatus } = require('../db/constants');
-
-import { BadRequestError, ERROR_NAMES } from '../error/errors';
+import { BadRequestError, ERROR_NAMES } from '@/error/errors';
 
 class Checker {
   // Common
   private throwBadRequestError(errorLog: string) {
-    console.error(errorLog);
-    throw new BadRequestError(ERROR_NAMES.INVALID_PARAM);
+    throw new BadRequestError(ERROR_NAMES.INVALID_PARAM, errorLog);
   }
 
   private requiredString(value: any, errorLog: string) {

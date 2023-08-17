@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-
 import jwt from 'jsonwebtoken';
-//const { ERROR_CODE, createAppError } = require('./appErrorMaker');
+
+import { ERROR_NAMES, UnauthorizedError, InternalServerError } from '@/error/errors';
 
 export enum UserType {
   user = 'user',
@@ -24,9 +24,7 @@ export default function auth(userType: UserType) {
       //  break;
       //}
       default: {
-        // TODO
-        throw new Error('에러 관리');
-        //throw createAppError(ERROR_CODE.internalServerError, 'internalServerError', 'auth error - undefined user type');
+        throw new InternalServerError(ERROR_NAMES.INTERNAL_SERVER_ERROR, 'auth error - undefined user type');
       }
     }
   };
@@ -43,27 +41,26 @@ export default function auth(userType: UserType) {
 
 function authMember(req: Request, next: NextFunction) {
   const loginToken = req.cookies.loginToken;
-  if (!loginToken || loginToken === 'null') {
-    // TODO
-    throw new Error('auth 에러 관리');
+  if (loginToken === undefined || loginToken === null || loginToken === 'null') {
+    throw new UnauthorizedError(ERROR_NAMES.UNAUTHORIZED, 'authMember - invalid loginToken');
   }
 
   try {
+    // TODO type
     const userInfo = jwt.verify(
       loginToken,
       process.env.TOKEN_SECRET_KEY || 'artsy-secret-key',
     ) as { userId: string };
     req.params.userId = userInfo.userId;
     next();
+
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
-      // TODO
-      throw new Error('에러 관리');
-      //throw createAppError(ERROR_CODE.unauthorized, 'unauthorized', 'only access member - token expired');
+      throw new UnauthorizedError(ERROR_NAMES.UNAUTHORIZED, 'authMember - only access member - token expired');
+
     } else if (error.name === 'JsonWebTokenError') {
-      // TODO
-      throw new Error('에러 관리');
-      //throw createAppError(ERROR_CODE.unauthorized, 'unauthorized', 'only access member - invalid token');
+      throw new UnauthorizedError(ERROR_NAMES.UNAUTHORIZED, 'authMember - only access member - invalid token');
+
     } else {
       throw error;
     }

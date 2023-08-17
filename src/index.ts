@@ -7,7 +7,7 @@ import cookieParser from 'cookie-parser';
 
 import getSwaggerOption from './swagger-ui';
 import apiRouter from './router';
-import { ERRORS } from './error/errors';
+//import { ERRORS, AppErrorBase } from './error/errors';
 
 const app = express();
 app.use(logger('dev'));
@@ -30,14 +30,17 @@ const { swaggerUI, specs, setUpOption } = getSwaggerOption();
 app.use('/api/api-docs', swaggerUI.serve, swaggerUI.setup(specs, setUpOption));
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  console.log('err', err);
+  console.error('error', err);
 
-  if (ERRORS[err.message]) {
-    const errorDetail = ERRORS[err.message];
-    res.status(err.statusCode).send(errorDetail.message);
-  } else {
-    res.status(err.statusCode || 500).send(err.message);
-  }
+  const errStatusCode = err.statusCode || 500;
+  const errMessage = err.appErrorMessage || 'Internal server error';
+
+  res
+    .status(errStatusCode)
+    .json({
+      success: false,
+      error: errMessage
+    });
 });
 
 const PORT = process.env.PORT || 5000;
@@ -45,3 +48,5 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`포트: ${PORT} 서버 가동 시작`);
 });
+
+
