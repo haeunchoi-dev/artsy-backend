@@ -1,7 +1,7 @@
-import { Injectable } from '../decorators/di-decorator';
-import TicketModel from '../models/ticket-model';
+import { Injectable } from '@/decorators/di-decorator';
+import TicketModel from '@/models/ticket-model';
 
-import { ITicket } from '../types/ticket';
+import { ITicket } from '@/types/ticket';
 
 @Injectable()
 class UserTicketService {

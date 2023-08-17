@@ -1,8 +1,8 @@
-import { Injectable } from '../decorators/di-decorator';
-import pool from '../db';
-import objectToArray from '../libs/objectToArrayForSql';
+import { Injectable } from '@/decorators/di-decorator';
+import pool from '@/db';
+import objectToArray from '@/libs/objectToArrayForSql';
 
-import { ITicket } from '../types/ticket';
+import { ITicket } from '@/types/ticket';
 
 @Injectable()
 class TicketModel {
