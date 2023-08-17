@@ -22,9 +22,20 @@ class TicketModel {
                           t.rating,
                           t.review,
                           t.create_date as createDate,
-                          t.update_date as updateDate
+                          t.update_date as updateDate,
+                          i.id as "fileId",
+                          i.image_url as "fileImageUrl",
+                          i.original_name as "fileOriginalName",
+                          i.file_name as "fileName",
+                          i.width as "fileWidth",
+                          i.height as "fileHeight",
+                          i.extension as "fileExtension",
+                          i.file_size as "fileSize",
+                          i.is_primary as "fileIsPrimary",
+                          i.create_date as "fileCreateDate"                      
                 FROM ticket t
                 LEFT JOIN category c ON t.category_id = c.id 
+                LEFT JOIN image i ON t.id = i.ticket_id AND i.is_primary = 1
                 WHERE t.user_id = ?`;
 
     transFilter.filterKey.forEach((o) => {
@@ -37,29 +48,6 @@ class TicketModel {
       userId,
       ...transFilter.filterValue,
     ]);
-
-    // TODO
-    // @ts-ignore
-    for (const o of result) {
-      // TODO
-      // @ts-ignore
-      o.files = await pool.promiseQuery(
-        `select id,
-                ticket_id as ticketId,
-                image_url as imageUrl,
-                original_name as originalName,
-                file_name as fileName,
-                width,
-                height,
-                extension,
-                file_size as fileSize,
-                is_primary as isPrimary,
-                create_date as createDate
-                from image 
-                where ticket_id = ?`,
-        [o.id],
-      );
-    }
 
     return result;
   }
@@ -92,8 +80,7 @@ class TicketModel {
       ],
     });
 
-    files.forEach((f) => {
-      //console.log(f);
+    files.forEach((f, i) => {
       queryList.push({
         query: `INSERT INTO image (ticket_id,
                 image_url,
@@ -115,7 +102,7 @@ class TicketModel {
           100,
           f.mimetype,
           f.size,
-          true,
+          i === 0,
         ],
       });
     });
@@ -123,7 +110,9 @@ class TicketModel {
     // TODO
     // @ts-ignore
     const result = await pool.executeMultipleQueriesInTransaction(queryList);
-    return result;
+
+    const netTicketResult = result[0];
+    return { id: netTicketResult.insertId };
   }
 
   async findById(ticketId: number) {
@@ -181,7 +170,7 @@ class TicketModel {
       [userId],
     );
 
-    return result;
+    return result[0];
   }
 
   async totalPriceByUserId(userId: string) {
@@ -194,7 +183,7 @@ class TicketModel {
       [userId],
     );
 
-    return result;
+    return result[0];
   }
 }
 
