@@ -1,4 +1,4 @@
-import mysql from 'mysql';
+import mysql, { QueryOptions, PoolConnection } from 'mysql';
 
 const sql_host = process.env.SQL_HOST;
 const sql_port = process.env.SQL_PORT;
@@ -16,7 +16,17 @@ if (
   throw new Error('database info is undefiend');
 }
 
-const pool = mysql.createPool({
+interface IQueriesWithValues {
+  query: string | QueryOptions,
+  values?: any
+}
+
+interface ICustomPool extends mysql.Pool {
+  promiseQuery?: (query: string | QueryOptions, values?: any) => Promise<any>;
+  executeMultipleQueriesInTransaction?: (queriesWithValues: IQueriesWithValues[]) => Promise<any>
+}
+
+const pool: ICustomPool = mysql.createPool({
   //   connectionLimit: 10,
   host: sql_host,
   port: Number(sql_port),
@@ -25,19 +35,14 @@ const pool = mysql.createPool({
   database: sql_db,
 });
 
-
 if (process.env.MODE === 'dev') {
   pool.on('connection', (connection) => {
     connection.config.debug = true;
   });
 }
 
-// TODO
-// @ts-ignore
-function promiseQuery(connection, query, values) {
+function promiseQuery(connection: PoolConnection, query: string | QueryOptions, values: any) {
   return new Promise((resolve, reject) => {
-    // TODO
-    // @ts-ignore
     connection.query(query, values, (error, results) => {
       if (error) reject(error);
       else resolve(results);
@@ -45,12 +50,8 @@ function promiseQuery(connection, query, values) {
   });
 }
 
-// TODO
-// @ts-ignore
-function beginTransaction(connection) {
+function beginTransaction(connection: PoolConnection) {
   return new Promise<void>((resolve, reject) => {
-    // TODO
-    // @ts-ignore
     connection.beginTransaction((err) => {
       if (err) reject(err);
       else resolve();
@@ -58,12 +59,8 @@ function beginTransaction(connection) {
   });
 }
 
-// TODO
-// @ts-ignore
-function commit(connection) {
+function commit(connection: PoolConnection) {
   return new Promise<void>((resolve, reject) => {
-    // TODO
-    // @ts-ignore
     connection.commit((err) => {
       if (err) reject(err);
       else resolve();
@@ -71,9 +68,7 @@ function commit(connection) {
   });
 }
 
-// TODO
-// @ts-ignore
-function rollback(connection) {
+function rollback(connection: PoolConnection) {
   return new Promise<void>((resolve, reject) => {
     connection.rollback(() => {
       resolve();
@@ -81,8 +76,6 @@ function rollback(connection) {
   });
 }
 
-// TODO
-// @ts-ignore
 pool.promiseQuery = function (sql, values) {
   return new Promise((resolve, reject) => {
     pool.query(sql, values, (error, results) => {
@@ -95,8 +88,6 @@ pool.promiseQuery = function (sql, values) {
   });
 };
 
-// TODO
-// @ts-ignore
 pool.executeMultipleQueriesInTransaction = function (queriesWithValues) {
   return new Promise((resolve, reject) => {
     console.log('Transaction start.');
