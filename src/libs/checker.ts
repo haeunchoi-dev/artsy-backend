@@ -22,20 +22,18 @@ class Checker {
     }
   }
 
-  //#requiredArray(arr, errorLog) {
-  //  if (!Array.isArray(arr) || arr.length === 0) {
-  //    console.error(errorLog);
-  //    this.#throwBadRequestAppError();
-  //  }
-  //}
+  private requiredArrayWithContent(value: any, errorLog: string) {
+    if (!Array.isArray(value) || value.length === 0) {
+      this.throwBadRequestError(errorLog);
+    }
+  }
 
-  //#requiredImageFile(image, errorLog) {
-    //  const ALLOW_IMAGE_TYPE = ['image/png', 'image/jpg', 'image/jpeg'];
-    //  if (image === null || image.mimetype === undefined || !ALLOW_IMAGE_TYPE.includes(image.mimetype)) {
-      //    console.error(errorLog);
-      //    this.#throwBadRequestAppError();
-      //  }
-  //}
+  private requiredImageFile(value: any, errorLog: string) {
+    const ALLOW_IMAGE_TYPE = ['image/png', 'image/jpg', 'image/jpeg'];
+    if (value === null || value.mimetype === undefined || !ALLOW_IMAGE_TYPE.includes(value.mimetype)) {
+      this.throwBadRequestError(errorLog);
+    }
+  }
   // end Common
   
   // Default Checker
@@ -64,99 +62,98 @@ class Checker {
     }
   }
 
-  //checkRequiredStringArrayParams() {
-  //  for (let i = 0; i < arguments.length; i++) {
-  //    const array = arguments[i];
-  //    this.#requiredArray(array, `Fail - checkRequiredStringArrayParams : ${i}`);
+  public checkRequiredStringArrayParams(...args: any[]) {
+    for (let i = 0; i < args.length; i++) {
+      const array = args[i];
+      this.requiredArrayWithContent(array, `Fail - checkRequiredStringArrayParams : ${i}`);
 
-  //    for (let j = 0; j < array.length; j++) {
-  //      const param = array[j];
-  //      this.#requiredString(param, `Fail - checkRequiredStringArrayParams : ${i}`);
-  //    }
-  //  }
-  //}
+      for (let j = 0; j < array.length; j++) {
+        const param = array[j];
+        this.requiredString(param, `Fail - checkRequiredStringArrayParams : ${i}`);
+      }
+    }
+  }
 
-  checkRequiredPositiveIntegerParams(...args: any[]) {
+  public checkRequiredPositiveIntegerParams(...args: any[]) {
     for (let i = 0; i < args.length; i++) {
       const param = args[i];
       this.requiredPositiveInteger(Number(param), `Fail - checkRequiredPositiveIntegerParams : ${i}`);
     }
   }
 
-  //checkOptionalStringParams() {
-  //  for (let i = 0; i < arguments.length; i++) {
-  //    const param = arguments[i];
-  //    if (param === undefined) continue;
-  //    this.#requiredString(param, `Fail - checkOptionalStringParams : ${i}`);
-  //  }
-  //}
+  public checkOptionalStringParams(...args: any[]) {
+    for (let i = 0; i < args.length; i++) {
+      const param = args[i];
+      if (param === undefined) continue;
+      this.requiredString(param, `Fail - checkOptionalStringParams : ${i}`);
+    }
+  }
 
-  //checkOptionalStringOrNullParams() {
-  //  for (let i = 0; i < arguments.length; i++) {
-  //    const param = arguments[i];
-  //    if (param === undefined) continue;
-  //    if (param === null || param === 'null') continue;
-  //    this.#requiredString(param, `Fail - checkOptionalStringParams : ${i}`);
-  //  }
-  //}
+  public checkOptionalStringOrNullParams(...args: any[]) {
+    for (let i = 0; i < args.length; i++) {
+      const param = args[i];
+      if (param === undefined) continue;
+      if (param === null || param === 'null') continue;
+      this.requiredString(param, `Fail - checkOptionalStringParams : ${i}`);
+    }
+  }
 
-  //checkOptionalPositiveIntegerParams() {
-  //  for (let i = 0; i < arguments.length; i++) {
-  //    const param = arguments[i];
-  //    if (param === undefined) continue;
-  //    this.#requiredPositiveInteger(Number(param), `Fail - checkOptionalPositiveIntegerParams : ${i}`);
-  //  }
-  //}
+  public checkOptionalPositiveIntegerParams(...args: any[]) {
+    for (let i = 0; i < args.length; i++) {
+      const param = args[i];
+      if (param === undefined) continue;
+      this.requiredPositiveInteger(Number(param), `Fail - checkOptionalPositiveIntegerParams : ${i}`);
+    }
+  }
 
-  //checkOptionalPositiveIntegerOrNullParams() {
-  //  for (let i = 0; i < arguments.length; i++) {
-  //    const param = arguments[i];
-  //    if (param === undefined) continue;
-  //    if (param === null || param === 'null') continue;
-  //    this.#requiredPositiveInteger(Number(param), `Fail - checkOptionalPositiveIntegerParams : ${i}`);
-  //  }
-  //}
+  public checkOptionalPositiveIntegerOrNullParams(...args: any[]) {
+    for (let i = 0; i < args.length; i++) {
+      const param = args[i];
+      if (param === undefined) continue;
+      if (param === null || param === 'null') continue;
+      this.requiredPositiveInteger(Number(param), `Fail - checkOptionalPositiveIntegerParams : ${i}`);
+    }
+  }
 
-  //checkOptionalImageFileParams() {
-  //  for (let i = 0; i < arguments.length; i++) {
-  //    const param = arguments[i];
-  //    if (param === undefined) continue;
-  //    this.#requiredImageFile(param, `Fail - checkRequiredImageFile : ${i}`)
-  //  }
-  //}
+  public checkOptionalImageFileParams(...args: any[]) {
+    for (let i = 0; i < args.length; i++) {
+      const param = args[i];
+      if (param === undefined) continue;
+      this.requiredImageFile(param, `Fail - checkRequiredImageFile : ${i}`)
+    }
+  }
 
-  //checkRequiredImageFileArrayParams() {
-  //  for (let i = 0; i < arguments.length; i++) {
-  //    const array = arguments[i];
-  //    this.#requiredArray(array, `Fail - checkRequiredImageFileArrayParams : ${i}`);
+  public checkRequiredImageFileArrayParams(...args: any[]) {
+    for (let i = 0; i < args.length; i++) {
+      const array = args[i];
+      this.requiredArrayWithContent(array, `Fail - checkRequiredImageFileArrayParams : ${i}`);
 
-  //    for (let j = 0; j < array.length; j++) {
-  //      const param = array[j];
-  //      this.#requiredImageFile(param, `Fail - checkRequiredImageFileArrayParams : ${i}`)
-  //    }
-  //  }
-  //}
+      for (let j = 0; j < array.length; j++) {
+        const param = array[j];
+        this.requiredImageFile(param, `Fail - checkRequiredImageFileArrayParams : ${i}`)
+      }
+    }
+  }
 
-  //checkOptionalImageFileArrayParams() {
-  //  for (let i = 0; i < arguments.length; i++) {
-  //    const array = arguments[i];
-  //    if (array === undefined) continue;
-  //    this.#requiredArray(array, `Fail - checkRequiredImageFileArrayParams : ${i}`);
+  public checkOptionalImageFileArrayParams(...args: any[]) {
+    for (let i = 0; i < args.length; i++) {
+      const array = args[i];
+      if (array === undefined) continue;
+      this.requiredArrayWithContent(array, `Fail - checkRequiredImageFileArrayParams : ${i}`);
 
-  //    for (let j = 0; j < array.length; j++) {
-  //      const param = array[j];
-  //      this.#requiredImageFile(param, `Fail - checkRequiredImageFileArrayParams : ${i}`)
-  //    }
-  //  }
-  //}
+      for (let j = 0; j < array.length; j++) {
+        const param = array[j];
+        this.requiredImageFile(param, `Fail - checkRequiredImageFileArrayParams : ${i}`)
+      }
+    }
+  }
 
-  //checkMaximumMBFileSize(mb, fileSize) {
-  //  const mbToByte = mb * 1024 * 1024;
-  //  if (fileSize === undefined || fileSize === null || typeof fileSize !== 'number' || mbToByte < fileSize) {
-  //    console.error(`Fail - checkMaximumMBFileSize`);
-  //    throw createAppError(ERROR_CODE.badRequest, 'invalid parameter');
-  //  }
-  //}
+  public checkMaximumMBFileSize(mb: number, fileSize: number) {
+    const mbToByte = mb * 1024 * 1024;
+    if (fileSize === undefined || fileSize === null || typeof fileSize !== 'number' || mbToByte < fileSize) {
+      this.throwBadRequestError(`Fail - checkMaximumMBFileSize : need under ${mb}mb`);
+    }
+  }
   // end Default Checker
 
   // Special Checker
