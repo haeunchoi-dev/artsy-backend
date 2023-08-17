@@ -1,3 +1,3 @@
-export function isEmpty(str: string | number) {
-  return typeof str == 'undefined' || str == null || str == '';
+export function isEmpty(obj: any) {
+  return typeof obj == 'undefined' || obj == null || obj == '';
 }
