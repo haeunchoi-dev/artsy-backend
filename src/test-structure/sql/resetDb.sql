@@ -48,7 +48,7 @@ CREATE TABLE `image` (
   `file_name` varchar(255) NOT NULL,
   `width` int(10) unsigned NOT NULL,
   `height` int(10) unsigned NOT NULL,
-  `extension` varchar(5) NOT NULL,
+  `extension` varchar(10) NOT NULL,
   `file_size` bigint(20) NOT NULL,
   `is_primary` tinyint(4) DEFAULT '0',
   `create_date` timestamp NULL DEFAULT NULL,

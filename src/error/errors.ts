@@ -2,26 +2,34 @@ export const ERROR_NAMES = {
   EMAIL_ALREADY_EXISTS: 'EMAIL_ALREADY_EXISTS',
   NOT_FOUND_EMAIL: 'NOT_FOUND_EMAIL',
   INCORRECT_PASSWORD: 'INCORRECT_PASSWORD',
+  DATA_NOT_FOUND: 'DATA_NOT_FOUND',
   INVALID_PARAM: 'INVALID_PARAM',
   UNAUTHORIZED: 'UNAUTHORIZED',
+  FORBIDDEN: 'FORBIDDEN',
   INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
 };
 
 const ERRORS = {
   [ERROR_NAMES.EMAIL_ALREADY_EXISTS]: {
-    message: '이 이메일은 현재 사용중입니다. 다른 이메일을 입력해 주세요.',
+    message: 'email already exists',
   },
   [ERROR_NAMES.NOT_FOUND_EMAIL]: {
-    message: '존재하지 않는 이메일입니다.',
+    message: 'not found email',
   },
   [ERROR_NAMES.INCORRECT_PASSWORD]: {
-    message: '비밀번호가 일치하지 않습니다.',
+    message: 'incorrect password',
+  },
+  [ERROR_NAMES.DATA_NOT_FOUND]: {
+    message: 'data not found',
   },
   [ERROR_NAMES.INVALID_PARAM]: {
-    message: '잘못된 요청 값이 있습니다.'
+    message: 'invalid param'
   },
   [ERROR_NAMES.UNAUTHORIZED]: {
-    message: '권한이 없습니다.'
+    message: 'unauthorized'
+  },
+  [ERROR_NAMES.FORBIDDEN]: {
+    message: 'forbidden'
   },
   [ERROR_NAMES.INTERNAL_SERVER_ERROR]: {
     message: 'internal server error'
@@ -29,18 +37,24 @@ const ERRORS = {
 };
 
 class AppErrorBase extends Error {
+  public appErrorType: string;
   public serverLog: string | undefined;
   public appErrorMessage: string;
 
   constructor(description: string, serverLog?: string) {
     super(description);
-    this.serverLog = serverLog !== undefined ? serverLog : description;
-    this.setAppErrorMessage(description);
-  }
 
-  setAppErrorMessage(description: string) {
-    const errDetail = ERRORS[description];
-    this.appErrorMessage = errDetail !== undefined ? errDetail.message : description;
+    const errorInfo = ERRORS[description];
+    if (errorInfo !== undefined) {
+      this.appErrorType = description;
+      this.serverLog = serverLog !== undefined ? serverLog : errorInfo.message;
+      this.appErrorMessage = errorInfo.message;
+
+    } else {
+      this.appErrorType = 'UNDEFINED_APP_ERROR_TYPE';
+      this.serverLog = serverLog !== undefined ? serverLog : description;
+      this.appErrorMessage = description;
+    }
   }
 }
 
