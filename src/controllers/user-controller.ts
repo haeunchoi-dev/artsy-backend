@@ -38,11 +38,16 @@ class UserController {
 
     const result = await this.service.loginWithEmail(email, password);
 
-    res.cookie('loginToken', result.token, { expires: new Date(Date.now() + 3600000) });
+    res.cookie('loginToken', result.token, {
+      expires: new Date(Date.now() + 3600000),
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+    });
 
     return {
-      ...result.userInfo
-    }
+      ...result.userInfo,
+    };
   }
 }
 
