@@ -16,7 +16,7 @@ app.use(
     credentials: true, // 사용자 인증이 필요한 리소스(쿠키 ..등) 접근
     //origin: 'http://localhost:3000',
     //origin: '*',
-    origin: true, // 출처 허용 옵션
+    origin: process.env.origin || true, // 출처 허용 옵션
   }),
 );
 app.use(express.json());
@@ -35,12 +35,10 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   const errStatusCode = err.statusCode || 500;
   const errMessage = err.appErrorMessage || 'Internal server error';
 
-  res
-    .status(errStatusCode)
-    .json({
-      success: false,
-      error: errMessage
-    });
+  res.status(errStatusCode).json({
+    success: false,
+    error: errMessage,
+  });
 });
 
 const PORT = process.env.PORT || 5000;
@@ -48,5 +46,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`포트: ${PORT} 서버 가동 시작`);
 });
-
-
