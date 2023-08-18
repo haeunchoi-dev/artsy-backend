@@ -40,8 +40,8 @@ class UserController {
 
     res.cookie('loginToken', result.token, {
       expires: new Date(Date.now() + 3600000),
-      //secure: true,
-      //sameSite: 'none',
+      secure: true,
+      sameSite: 'none',
     });
 
     return {
