@@ -22,6 +22,10 @@ export default {
               schema: {
                 type: 'object',
                 properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
                   artsyData: {
                     type: 'array',
                     items: {
@@ -85,62 +89,54 @@ export default {
                           type: 'Timestamp',
                           description: '수정일',
                         },
-                        files: {
-                          type: 'array',
-                          items: {
-                            type: 'object',
-                            properties: {
-                              id: {
-                                type: 'int',
-                                description: '이미지 id',
-                                example: 1,
-                              },
-                              imageUrl: {
-                                type: 'string',
-                                description: '이미지 url',
-                                example: 'http://localhost:5000/api/api-docs/',
-                              },
-                              originalName: {
-                                type: 'string',
-                                description: '오리진 파일명',
-                                example: '원래이름.jpg',
-                              },
-                              fileName: {
-                                type: 'string',
-                                description: '파일명',
-                                example: '변경된이름.jpg',
-                              },
-                              width: {
-                                type: 'int',
-                                description: '가로 사이즈',
-                                example: 100,
-                              },
-                              height: {
-                                type: 'int',
-                                description: '세로 사이즈',
-                                example: 100,
-                              },
-                              extension: {
-                                type: 'string',
-                                description: '확장자',
-                                example: 'jpg',
-                              },
-                              fileSize: {
-                                type: 'int',
-                                description: '이미지 파일 크기',
-                                example: 1000,
-                              },
-                              isPrimary: {
-                                type: 'int',
-                                description: '대표 이미지 여부 (1 or 0)',
-                                example: 1,
-                              },
-                              createDate: {
-                                type: 'Timestamp',
-                                description: '등록일',
-                              },
-                            },
-                          },
+                        fileId: {
+                          type: 'int',
+                          description: '이미지 id',
+                          example: 1,
+                        },
+                        fileImageUrl: {
+                          type: 'string',
+                          description: '이미지 url',
+                          example: 'http://localhost:5000/api/api-docs/',
+                        },
+                        fileOriginalName: {
+                          type: 'string',
+                          description: '오리진 파일명',
+                          example: '원래이름.jpg',
+                        },
+                        fileName: {
+                          type: 'string',
+                          description: '파일명',
+                          example: '변경된이름.jpg',
+                        },
+                        fileWidth: {
+                          type: 'int',
+                          description: '가로 사이즈',
+                          example: 100,
+                        },
+                        fileHeight: {
+                          type: 'int',
+                          description: '세로 사이즈',
+                          example: 100,
+                        },
+                        fileExtension: {
+                          type: 'string',
+                          description: '확장자',
+                          example: 'jpg',
+                        },
+                        fileSize: {
+                          type: 'int',
+                          description: '이미지 파일 크기',
+                          example: 1000,
+                        },
+                        fileIsPrimary: {
+                          type: 'int',
+                          description: '대표 이미지 여부 (1 or 0)',
+                          example: 1,
+                        },
+                        fileCreateDate: {
+                          type: 'Timestamp',
+                          description: '등록일',
                         },
                       },
                     },

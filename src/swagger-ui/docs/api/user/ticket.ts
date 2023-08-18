@@ -65,6 +65,10 @@ export default {
               schema: {
                 type: 'object',
                 properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
                   artsyData: {
                     type: 'object',
                     properties: {
@@ -106,6 +110,10 @@ export default {
               schema: {
                 type: 'object',
                 properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
                   artsyData: {
                     type: 'object',
                     properties: {
@@ -247,6 +255,10 @@ export default {
               schema: {
                 type: 'object',
                 properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
                   artsyData: {
                     type: 'object',
                     properties: {
@@ -278,6 +290,10 @@ export default {
               schema: {
                 type: 'object',
                 properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
                   artsyData: {
                     type: 'object',
                     properties: {
