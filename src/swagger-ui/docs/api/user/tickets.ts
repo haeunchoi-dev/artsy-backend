@@ -131,9 +131,9 @@ export default {
                                 example: 1000,
                               },
                               isPrimary: {
-                                type: 'boolean',
-                                description: '대표 이미지 여부',
-                                example: true,
+                                type: 'int',
+                                description: '대표 이미지 여부 (1 or 0)',
+                                example: 1,
                               },
                               createDate: {
                                 type: 'Timestamp',
