@@ -1,40 +1,43 @@
 import { Injectable } from '@/decorators/di-decorator';
-import pool from '@/db';
+//import pool from '@/db';
+import db from '@/db/test-db';
 
 @Injectable()
 class UserModel {
   constructor() {}
 
   async findByEmail(email: string) {
-    // TODO
-    // @ts-ignore
-    const result = await pool.promiseQuery(
-      `
-        SELECT
-          id,
-          display_name as displayName,
-          email,
-          password,
-          create_date as createdDate
-        FROM user
-        WHERE email = ?
-      `,
-      [email],
-    );
+    return await db.excuteQuery(async (connection) => {
+      const result = await connection.query(
+        `
+          SELECT
+            id,
+            display_name as displayName,
+            email,
+            password,
+            create_date as createdDate
+          FROM user
+          WHERE email = ?
+        `,
+        [email]
+      );
 
-    return result;
+      return result;
+    });
   }
 
   async create(displayName: string, email: string, password: string) {
-    // TODO
-    // @ts-ignore
-    await pool.promiseQuery(
-      `
-        INSERT INTO user(display_name, email, password)
-        VALUES (?, ?, ?);
-      `,
-      [displayName, email, password],
-    );
+    return await db.excuteQuery(async (connection) => {
+      const result = await connection.query(
+        `
+          INSERT INTO user(display_name, email, password)
+          VALUES (?, ?, ?);
+        `,
+        [displayName, email, password],
+      );
+
+      return result;
+    });
   }
 }
 
