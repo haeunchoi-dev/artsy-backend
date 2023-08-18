@@ -15,7 +15,7 @@ class CategoryService {
     const categories = await this.categoryModel.getCategory(categoryId);
 
     if (categories.length === 0) {
-      throw new BadRequestError(ERROR_NAMES.INVALID_PARAM, 'getCategory - categories.length === 0');
+      throw new BadRequestError(ERROR_NAMES.DATA_NOT_FOUND, 'getCategory - categories.length === 0');
     }
 
     return categories[0];

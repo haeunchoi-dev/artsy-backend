@@ -1,4 +1,4 @@
-import mysql, { QueryOptions, PoolConnection } from 'mysql';
+import promiseMysql from 'promise-mysql';
 
 const sql_host = process.env.SQL_HOST;
 const sql_port = process.env.SQL_PORT;
@@ -16,17 +16,7 @@ if (
   throw new Error('database info is undefiend');
 }
 
-interface IQueriesWithValues {
-  query: string | QueryOptions,
-  values?: any
-}
-
-interface ICustomPool extends mysql.Pool {
-  promiseQuery?: (query: string | QueryOptions, values?: any) => Promise<any>;
-  executeMultipleQueriesInTransaction?: (queriesWithValues: IQueriesWithValues[]) => Promise<any>
-}
-
-const pool: ICustomPool = mysql.createPool({
+const pool = promiseMysql.createPool({
   //   connectionLimit: 10,
   host: sql_host,
   port: Number(sql_port),
@@ -35,90 +25,71 @@ const pool: ICustomPool = mysql.createPool({
   database: sql_db,
 });
 
-if (process.env.MODE === 'dev') {
-  pool.on('connection', (connection) => {
-    connection.config.debug = true;
-  });
-}
+export class Database {
+  constructor() {
+    if (process.env.MODE === 'dev') {
+      (async () => {
+        const _pool = await pool;
+        _pool.on('connection', (connection) => {
+          connection.config.debug = true;
+        });
+      })();
+    }
+  }
 
-function promiseQuery(connection: PoolConnection, query: string | QueryOptions, values: any) {
-  return new Promise((resolve, reject) => {
-    connection.query(query, values, (error, results) => {
-      if (error) reject(error);
-      else resolve(results);
-    });
-  });
-}
+  private async getConnection(): Promise<promiseMysql.PoolConnection> {
+    const connection = await (await pool).getConnection();
+    return connection;
+  }
 
-function beginTransaction(connection: PoolConnection) {
-  return new Promise<void>((resolve, reject) => {
-    connection.beginTransaction((err) => {
-      if (err) reject(err);
-      else resolve();
-    });
-  });
-}
+  public async excuteQuery(
+    callbackFn: (connection: promiseMysql.PoolConnection) => Promise<any>,
+  ) {
+    let connection: promiseMysql.PoolConnection | null = null;
 
-function commit(connection: PoolConnection) {
-  return new Promise<void>((resolve, reject) => {
-    connection.commit((err) => {
-      if (err) reject(err);
-      else resolve();
-    });
-  });
-}
+    try {
+      connection = await this.getConnection();
 
-function rollback(connection: PoolConnection) {
-  return new Promise<void>((resolve, reject) => {
-    connection.rollback(() => {
-      resolve();
-    });
-  });
-}
-
-pool.promiseQuery = function (sql, values) {
-  return new Promise((resolve, reject) => {
-    pool.query(sql, values, (error, results) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(results);
-      }
-    });
-  });
-};
-
-pool.executeMultipleQueriesInTransaction = function (queriesWithValues) {
-  return new Promise((resolve, reject) => {
-    console.log('Transaction start.');
-    pool.getConnection(async (err, connection) => {
-      if (err) return reject(err);
-
-      try {
-        const resultArr = [];
-        await beginTransaction(connection);
-
-        for (let i = 0; i < queriesWithValues.length; i++) {
-          const result = await promiseQuery(
-            connection,
-            queriesWithValues[i].query,
-            queriesWithValues[i].values,
-          );
-          resultArr.push(result);
-        }
-
-        await commit(connection);
-        console.log('Transaction Completed Successfully.');
-        resolve(resultArr);
-      } catch (error) {
-        console.log('Transaction error.');
-        await rollback(connection);
-        reject(error);
-      } finally {
+      const result = await callbackFn(connection);
+      return result;
+    } catch (error) {
+      console.error('error - excuteQuery', error);
+      throw error;
+    } finally {
+      if (connection !== null) {
         connection.release();
       }
-    });
-  });
-};
+    }
+  }
 
-export default pool;
+  public async excuteQueryWithTransaction(
+    callbackFn: (connection: promiseMysql.PoolConnection) => Promise<any>,
+  ) {
+    let connection: promiseMysql.PoolConnection | null = null;
+
+    try {
+      connection = await this.getConnection();
+
+      await connection.beginTransaction();
+      const result = await callbackFn(connection);
+      await connection.commit();
+
+      return result;
+    } catch (error) {
+      console.error('excuteQueryWithTransaction', error);
+
+      if (connection !== null) {
+        await connection.rollback();
+      }
+
+      throw error;
+    } finally {
+      if (connection !== null) {
+        connection.release();
+      }
+    }
+  }
+}
+
+const _inst = new Database();
+export default _inst;
