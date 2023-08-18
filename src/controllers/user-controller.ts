@@ -43,7 +43,8 @@ class UserController {
       httpOnly: true,
       sameSite: 'none',
       secure: true,
-      domain: 'localhost'
+      path: '/',
+      domain: 'http://192.168.35.245:3000'
     });
 
     return {
