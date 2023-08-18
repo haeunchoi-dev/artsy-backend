@@ -1,6 +1,5 @@
 import { Injectable } from '@/decorators/di-decorator';
-//import pool from '@/db';
-import db from '@/db/test-db';
+import db from '@/db';
 
 @Injectable()
 class CategoryModel {
@@ -28,7 +27,7 @@ class CategoryModel {
           FROM category
           WHERE id = ?
         `,
-        [categoryId]
+        [categoryId],
       );
 
       return result;

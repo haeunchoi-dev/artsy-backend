@@ -1,8 +1,7 @@
 import { Injectable } from '@/decorators/di-decorator';
-import pool from '@/db';
 import objectToArray from '@/libs/objectToArrayForSql';
-
 import { ITicket } from '@/types/ticket';
+import db from '@/db';
 
 @Injectable()
 class TicketModel {
@@ -42,14 +41,14 @@ class TicketModel {
       sql += ` AND ${o} = ?`;
     });
 
-    // TODO
-    // @ts-ignore
-    const result = await pool.promiseQuery(sql, [
-      userId,
-      ...transFilter.filterValue,
-    ]);
+    return db.excuteQuery(async (connection) => {
+      const result = await connection.query(sql, [
+        userId,
+        ...transFilter.filterValue,
+      ]);
 
-    return result;
+      return result;
+    });
   }
 
   async create(
@@ -57,69 +56,58 @@ class TicketModel {
     files: any[],
     { categoryId, title, showDate, place, price, rating, review }: ITicket,
   ) {
-    const queryList = [];
-    queryList.push({
-      query: `INSERT INTO ticket (user_id,
-              category_id,
-              title,
-              show_date,
-              place,
-              price,
-              rating,
-              review) 
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      values: [
-        userId,
-        categoryId,
+    return await db.excuteQueryWithTransaction(async (connection) => {
+      const result = await connection.query(
+        `INSERT INTO ticket (
+        user_id,
+        category_id,
         title,
-        showDate,
+        show_date,
         place,
         price,
         rating,
-        review,
-      ],
+        review) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [userId, categoryId, title, showDate, place, price, rating, review],
+      );
+
+      const ticketId = result.insertId;
+
+      for (const [i, f] of files.entries()) {
+        await connection.query(
+          `INSERT INTO image (
+            ticket_id,
+            image_url,
+            original_name,
+            file_name,
+            width,
+            height,
+            extension,
+            file_size,
+            is_primary) 
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            ticketId,
+            f.path,
+            f.originalname,
+            f.filename,
+            100,
+            100,
+            f.mimetype,
+            f.size,
+            i === 0,
+          ],
+        );
+      }
+
+      return { id: ticketId };
     });
-
-    files.forEach((f, i) => {
-      queryList.push({
-        query: `INSERT INTO image (ticket_id,
-                image_url,
-                original_name,
-                file_name,
-                width,
-                height,
-                extension,
-                file_size,
-                is_primary) 
-              VALUES ((select id from ticket WHERE user_id = ? and category_id = ?  ORDER BY id DESC LIMIT 1),?, ?, ?, ?, ?, ?, ?, ?)`,
-        values: [
-          userId,
-          categoryId,
-          f.path,
-          f.originalname,
-          f.filename,
-          100,
-          100,
-          f.mimetype,
-          f.size,
-          i === 0,
-        ],
-      });
-    });
-
-    // TODO
-    // @ts-ignore
-    const result = await pool.executeMultipleQueriesInTransaction(queryList);
-
-    const netTicketResult = result[0];
-    return { id: netTicketResult.insertId };
   }
 
   async findById(ticketId: number) {
-    // TODO
-    // @ts-ignore
-    const result = await pool.promiseQuery(
-      `SELECT     t.id,
+    return await db.excuteQueryWithTransaction(async (connection) => {
+      const result = await connection.query(
+        `SELECT   t.id,
                   t.category_id as categoryId,
                   c.name as categoryName,  
                   c.color as categoryColor, 
@@ -134,14 +122,13 @@ class TicketModel {
                 FROM ticket t
                 LEFT JOIN category c ON t.category_id = c.id 
                 WHERE t.id = ?`,
-      [ticketId],
-    );
+        [ticketId],
+      );
 
-    const ticket = { ...result[0] };
-    // TODO
-    // @ts-ignore
-    ticket.files = await pool.promiseQuery(
-      `select id,
+      const ticket = { ...result[0] };
+
+      ticket.files = await connection.query(
+        `select id,
                 ticket_id as ticketId,
                 image_url as imageUrl,
                 original_name as originalName,
@@ -154,36 +141,37 @@ class TicketModel {
                 create_date as createDate
                 from image 
                 where ticket_id = ?`,
-      [ticket.id],
-    );
+        [ticket.id],
+      );
 
-    return ticket;
+      return ticket;
+    });
   }
 
   async totalCountByUserId(userId: string) {
-    // TODO
-    // @ts-ignore
-    const result = await pool.promiseQuery(
-      `SELECT   count(id) as total
-                FROM ticket 
-                WHERE user_id = ?`,
-      [userId],
-    );
+    return db.excuteQuery(async (connection) => {
+      const result = await connection.query(
+        `SELECT  count(id) as total
+            FROM ticket 
+            WHERE user_id = ?`,
+        [userId],
+      );
 
-    return result[0];
+      return result[0];
+    });
   }
 
   async totalPriceByUserId(userId: string) {
-    // TODO
-    // @ts-ignore
-    const result = await pool.promiseQuery(
-      `SELECT   sum(price) as totalPrice
-                FROM ticket 
-                WHERE user_id = ?`,
-      [userId],
-    );
+    return db.excuteQuery(async (connection) => {
+      const result = await connection.query(
+        `SELECT   sum(price) as totalPrice
+        FROM ticket 
+        WHERE user_id = ?`,
+        [userId],
+      );
 
-    return result[0];
+      return result[0];
+    });
   }
 }
 

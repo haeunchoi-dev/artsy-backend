@@ -1,6 +1,5 @@
 import { Injectable } from '@/decorators/di-decorator';
-//import pool from '@/db';
-import db from '@/db/test-db';
+import db from '@/db';
 
 @Injectable()
 class UserModel {
@@ -19,7 +18,7 @@ class UserModel {
           FROM user
           WHERE email = ?
         `,
-        [email]
+        [email],
       );
 
       return result;
