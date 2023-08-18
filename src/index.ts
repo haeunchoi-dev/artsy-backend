@@ -7,7 +7,6 @@ import cookieParser from 'cookie-parser';
 
 import getSwaggerOption from './swagger-ui';
 import apiRouter from './router';
-//import { ERRORS, AppErrorBase } from './error/errors';
 
 const app = express();
 app.use(logger('dev'));

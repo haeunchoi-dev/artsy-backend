@@ -42,7 +42,6 @@ class UserController {
       expires: new Date(Date.now() + 3600000),
       sameSite: 'none',
       httpOnly: true,
-      secure: false,
       domain: 'http://localhost:3000'
     });
 
