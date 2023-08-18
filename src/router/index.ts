@@ -7,8 +7,6 @@ import UserController from '../controllers/user-controller';
 import UserTicketController from '../controllers/user-ticket-controller';
 import CategoryController from '../controllers/category-controller';
 
-import { createProxyMiddleware } from 'http-proxy-middleware';
-
 const router = express.Router();
 
 function registerRoutes(controller: any) {
@@ -47,10 +45,6 @@ export default (app: express.Application) => {
   const root = process.env.ROOT || '/api';
   app.use(
     root,
-    createProxyMiddleware({
-      target: "http://13.125.231.169:5000", // 서버 URL
-      changeOrigin: true,
-    }),
     router
   );
 };
