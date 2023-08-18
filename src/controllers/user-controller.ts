@@ -40,6 +40,10 @@ class UserController {
 
     res.cookie('loginToken', result.token, {
       expires: new Date(Date.now() + 3600000),
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+      domain: 'localhost'
     });
 
     return {
