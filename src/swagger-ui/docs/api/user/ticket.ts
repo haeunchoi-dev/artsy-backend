@@ -241,6 +241,125 @@ export default {
         },
       },
     },
+    put: {
+      tags: ['User Ticket'],
+      summary: '티켓 상세 수정',
+      description: '티켓 상세 수정',
+      parameters: [
+        {
+          name: 'ticketId',
+          in: 'path',
+          description: '티켓 ID',
+          schema: {
+            type: 'int',
+          },
+        },
+      ],
+      requestBody: {
+        content: {
+          'multipart/form-data': {
+            schema: {
+              type: 'object',
+              properties: {
+                categoryId: {
+                  type: 'int',
+                  description: '카테고리 id',
+                  example: 1,
+                },
+                title: {
+                  type: 'string',
+                  description: '타이틀',
+                  example: '영화제목',
+                },
+                showDate: {
+                  type: 'date',
+                  description: '관람일',
+                  example: '2023-08-14',
+                },
+                place: {
+                  type: 'string',
+                  description: '장소',
+                  example: '성수 메가박스',
+                },
+                price: {
+                  type: 'int',
+                  description: '금액',
+                  example: 100000,
+                },
+                rating: {
+                  type: 'int',
+                  description: '별점',
+                  example: 3,
+                },
+                review: {
+                  type: 'string',
+                  description: '리뷰',
+                  example: '오늘 영화봄',
+                },
+                file: {
+                  type: 'array',
+                  items: {
+                    type: 'string',
+                    format: 'binary',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: '수정 성공 여부',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    delete: {
+      tags: ['User Ticket'],
+      summary: '티켓 삭제',
+      description: '티켓 삭제',
+      parameters: [
+        {
+          name: 'ticketId',
+          in: 'path',
+          description: '티켓 ID',
+          schema: {
+            type: 'int',
+          },
+        },
+      ],
+      responses: {
+        200: {
+          description: '삭제 성공 여부',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   },
   '/api/user/ticket-total-count': {
     get: {
