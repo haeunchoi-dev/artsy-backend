@@ -16,7 +16,7 @@ app.use(
     credentials: true, // 사용자 인증이 필요한 리소스(쿠키 ..등) 접근
     //origin: 'http://localhost:3000',
     //origin: '*',
-    origin: process.env.origin || true, // 출처 허용 옵션
+    origin: process.env.ORIGIN || true, // 출처 허용 옵션
   }),
 );
 app.use(express.json());
@@ -41,7 +41,7 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   // {
   //   "type": "/errors/incorrect-user-pass",
   //   "title": "Incorrect username or password.",
-  //   "status": 401, 
+  //   "status": 401,
   //   "detail": "Authentication failed due to incorrect username or password.",
   //   "instance": "/login/log/abc123"
   // }
@@ -76,13 +76,16 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   const errStatusCode: number = err.statusCode || 500;
 
   const responseError: {
-    type?: string,
-    code: number,
-    message: string
+    type?: string;
+    code: number;
+    message: string;
   } = {
     code: errStatusCode,
-    message: err.appErrorMessage !== undefined ? `${err.name} - ${err.appErrorMessage}` : 'Internal server error',
-  }
+    message:
+      err.appErrorMessage !== undefined
+        ? `${err.name} - ${err.appErrorMessage}`
+        : 'Internal server error',
+  };
 
   if (err.appErrorType !== undefined) {
     responseError.type = err.appErrorType;
@@ -90,7 +93,7 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 
   res.status(errStatusCode).json({
     success: false,
-    error: responseError
+    error: responseError,
   });
 });
 
