@@ -38,10 +38,13 @@ class UserController {
 
     const result = await this.service.loginWithEmail(email, password);
 
+    const secure = process.env.COOKIE_SECURE === 'true';
+    const sameSite = (process.env.COOKIE_SAMESITE as 'none') || 'lax';
+
     res.cookie('loginToken', result.token, {
       expires: new Date(Date.now() + 3600000),
-      secure: true,
-      sameSite: 'none',
+      secure,
+      sameSite,
     });
 
     return {
