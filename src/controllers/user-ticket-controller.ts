@@ -17,7 +17,7 @@ class UserTicketController {
   @Route('get', '/user/tickets', auth(UserType.user))
   async getTicketList(req: Request, res: Response) {
     const userId = req.params.userId;
-    const { categoryId } = req.query;
+    const { categoryId, perPage, page } = req.query;
 
     //TODO
     //string to number
@@ -25,8 +25,10 @@ class UserTicketController {
     const ticketList = await this.service.getTicketList(
       userId,
       categoryId ? Number(categoryId) : null,
+      perPage ? Number(perPage) : 0,
+      page ? Number(page) : 0,
     );
-    return ticketList;
+    return { ...ticketList };
   }
 
   @Route('post', '/user/ticket', auth(UserType.user), upload.array('file'))
@@ -54,12 +56,50 @@ class UserTicketController {
 
   @Route('get', '/user/ticket/:ticketId', auth(UserType.user))
   async getTicket(req: Request, res: Response) {
+    const userId = req.params.userId;
     const { ticketId } = req.params;
 
     //TODO
     //string to number
 
-    const ticket = await this.service.getTicket(Number(ticketId));
+    return await this.service.getTicket(userId, Number(ticketId));
+  }
+
+  @Route(
+    'put',
+    '/user/ticket/:ticketId',
+    auth(UserType.user),
+    upload.array('file'),
+  )
+  async updateTicket(req: Request, res: Response) {
+    const userId = req.params.userId;
+    const { ticketId } = req.params;
+    const files = req.files || [];
+
+    const { categoryId, title, showDate, place, price, rating, review } =
+      req.body;
+
+    //TODO
+    // string to number
+
+    return await this.service.updateTicket(userId, Number(ticketId), files, {
+      categoryId: Number(categoryId),
+      title,
+      showDate,
+      place,
+      price: Number(price),
+      rating: Number(rating),
+      review,
+    });
+  }
+
+  @Route('delete', '/user/ticket/:ticketId', auth(UserType.user))
+  async deleteTicket(req: Request, res: Response) {
+    const userId = req.params.userId;
+    const { ticketId } = req.params;
+
+    const ticket = await this.service.deleteTicket(userId, Number(ticketId));
+
     return ticket;
   }
 
