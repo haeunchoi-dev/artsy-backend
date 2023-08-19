@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-
+import auth, { UserType } from '@/middlewares/auth';
 import { Injectable } from '@/decorators/di-decorator';
 import { Route } from '@/decorators/route-decorator';
 import checker from '@/libs/checker';
@@ -52,6 +52,12 @@ class UserController {
     return {
       ...result.userInfo,
     };
+  }
+
+  @Route('get', '/user/info', auth(UserType.user))
+  async getUserInfo(req: Request, res: Response) {
+    const userId = req.params.userId;
+    return await this.service.getUserInfo(userId);
   }
 }
 
