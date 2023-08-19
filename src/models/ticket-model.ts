@@ -7,7 +7,7 @@ import db from '@/db';
 class TicketModel {
   constructor() {}
 
-  async findByUserId(userId: string, filter = {}) {
+  async findByUserId(userId: string, filter = {}, limit = 0, offset = 0) {
     const transFilter = objectToArray(filter);
 
     let sql = `SELECT     t.id,
@@ -37,17 +37,31 @@ class TicketModel {
                 LEFT JOIN image i ON t.id = i.ticket_id AND i.is_primary = 1
                 WHERE t.user_id = ?`;
 
+    let count_sql = `SELECT count(t.id) as count                    
+                      FROM ticket t
+                      WHERE t.user_id = ? `;
+
     transFilter.filterKey.forEach((o) => {
-      sql += ` AND ${o} = ?`;
+      sql += ` AND t.${o} = ?`;
+      count_sql += ` AND t.${o} = ?`;
     });
 
-    return db.excuteQuery(async (connection) => {
-      const result = await connection.query(sql, [
+    if (limit > 0) {
+      sql += ` LIMIT ${limit} OFFSET ${offset}`;
+    }
+
+    return await db.excuteQuery(async (connection) => {
+      const totalCount = await connection.query(count_sql, [
         userId,
         ...transFilter.filterValue,
       ]);
 
-      return result;
+      const ticketList = await connection.query(sql, [
+        userId,
+        ...transFilter.filterValue,
+      ]);
+
+      return { totalCount: totalCount[0].count, ticketList };
     });
   }
 
@@ -108,7 +122,7 @@ class TicketModel {
   }
 
   async findById(ticketId: number) {
-    return await db.excuteQueryWithTransaction(async (connection) => {
+    return await db.excuteQuery(async (connection) => {
       const result = await connection.query(
         `SELECT   t.id,
                   t.category_id as categoryId,
@@ -151,6 +165,35 @@ class TicketModel {
     });
   }
 
+  async update(
+    ticketId: number,
+    files:
+      | Express.Multer.File[]
+      | {
+          [fieldname: string]: Express.Multer.File[];
+        },
+    { categoryId, title, showDate, place, price, rating, review }: ITicket,
+  ) {
+    return await db.excuteQueryWithTransaction(async (connection) => {
+      await connection.query(
+        `UPDATE ticket
+         SET   
+            category_id = ?,
+            title = ?,
+            show_date = ?,
+            place = ?,
+            price = ?,
+            rating = ?,
+            review = ?
+        WHERE
+            id = ?`,
+        [categoryId, title, showDate, place, price, rating, review, ticketId],
+      );
+
+      return { id: ticketId };
+    });
+  }
+
   async totalCountByUserId(userId: string) {
     return db.excuteQuery(async (connection) => {
       const result = await connection.query(
@@ -174,6 +217,54 @@ class TicketModel {
       );
 
       return result[0];
+    });
+  }
+
+  async findUserIdById(ticketId: number) {
+    return await db.excuteQuery(async (connection) => {
+      return await connection.query(
+        `
+        SELECT user_id as userId FROM ticket WHERE id = ? 
+        `,
+        [ticketId],
+      );
+    });
+  }
+
+  async deleteById(ticketId: number) {
+    return await db.excuteQueryWithTransaction(async (connection) => {
+      const result = await connection.query(
+        `select id,
+                ticket_id as ticketId,
+                image_url as imageUrl,
+                original_name as originalName,
+                file_name as fileName,
+                width,
+                height,
+                extension,
+                file_size as fileSize,
+                is_primary as isPrimary,
+                create_date as createDate
+                from image 
+                where ticket_id = ?`,
+        [ticketId],
+      );
+
+      await connection.query(
+        `
+        DELETE FROM image WHERE ticket_id = ?
+        `,
+        [ticketId],
+      );
+
+      await connection.query(
+        `
+        DELETE FROM ticket WHERE id = ?
+        `,
+        [ticketId],
+      );
+
+      return result;
     });
   }
 }
