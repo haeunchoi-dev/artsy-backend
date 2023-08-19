@@ -38,6 +38,27 @@ class UserModel {
       return result;
     });
   }
+
+  async userInfoByUserId(userId: string) {
+    return await db.excuteQuery(async (connection) => {
+      const result = await connection.query(
+        `
+        SELECT
+          u.display_name as displayName,
+          u.email,
+          u.create_date as createdDate,
+          count(t.id) as totalTicket
+        FROM user u
+        LEFT JOIN ticket t ON t.user_id  = u.id 
+        WHERE u.id = ?
+        group by u.display_name, u.email, u.create_date
+        `,
+        [userId],
+      );
+
+      return result[0];
+    });
+  }
 }
 
 export default UserModel;
