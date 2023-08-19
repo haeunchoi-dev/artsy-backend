@@ -40,9 +40,11 @@ class UserController {
 
     const secure = process.env.COOKIE_SECURE === 'true';
     const sameSite = (process.env.COOKIE_SAMESITE as 'none') || 'lax';
+    const httpOnly = process.env.COOKIE_HTTPONLY === 'true';
 
     res.cookie('loginToken', result.token, {
       expires: new Date(Date.now() + 3600000),
+      httpOnly,
       secure,
       sameSite,
     });

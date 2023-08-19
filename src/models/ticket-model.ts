@@ -73,20 +73,21 @@ class TicketModel {
 
       const ticketId = result.insertId;
 
-      for (const [i, f] of files.entries()) {
-        await connection.query(
-          `INSERT INTO image (
-            ticket_id,
-            image_url,
-            original_name,
-            file_name,
-            width,
-            height,
-            extension,
-            file_size,
-            is_primary) 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          [
+      if (files.length > 0) {
+        let imageQuery = `INSERT INTO image (
+          ticket_id,
+          image_url,
+          original_name,
+          file_name,
+          width,
+          height,
+          extension,
+          file_size,
+          is_primary) VALUES`;
+
+        const imageInsertValues = files.flatMap((f, i) => {
+          imageQuery += ` ${i === 0 ? '' : ','}(?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+          return [
             ticketId,
             f.path,
             f.originalname,
@@ -96,8 +97,10 @@ class TicketModel {
             f.mimetype,
             f.size,
             i === 0,
-          ],
-        );
+          ];
+        });
+
+        await connection.query(imageQuery, imageInsertValues);
       }
 
       return { id: ticketId };
