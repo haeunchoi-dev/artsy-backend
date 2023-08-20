@@ -1,5 +1,5 @@
 export default {
-  '/api/user/sign-up-with-email': {
+  '/api/user/sign-up': {
     post: {
       tags: ['User'],
       summary: '회원가입',

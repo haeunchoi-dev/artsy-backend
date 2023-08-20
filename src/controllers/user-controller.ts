@@ -10,8 +10,8 @@ import UserService from '@/services/user-service';
 class UserController {
   constructor(private readonly service: UserService) {}
 
-  @Route('post', '/user/sign-up-with-email')
-  async signUpWithEmail(req: Request, res: Response) {
+  @Route('post', '/user/sign-up')
+  async signUp(req: Request, res: Response) {
     const { displayName, email, password } = req.body;
 
     checker.checkEmailFormat(email);
