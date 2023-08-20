@@ -19,6 +19,7 @@ class CategoryController {
   async getCategory(req: Request, res: Response) {
     const { categoryId } = req.params;
 
+    // TODO dto
     checker.checkRequiredPositiveIntegerParams(Number(categoryId));
 
     return await this.service.getCategory(Number(categoryId));
