@@ -12,17 +12,10 @@ class UserTicketService {
   async getTicketList(
     userId: string,
     categoryId: number | null,
-    perPage: number,
-    page: number,
+    limit: number,
+    lastId: number | null,
   ) {
-    let limit = 0;
-    let offset = 0;
-    if (perPage > 0) {
-      limit = perPage;
-      offset = (page - 1) * perPage;
-    }
-
-    return await this.model.findByUserId(userId, { categoryId }, limit, offset);
+    return await this.model.findByUserId(userId, { categoryId }, limit, lastId);
   }
 
   async setTicket(
@@ -31,7 +24,9 @@ class UserTicketService {
     { categoryId, title, showDate, place, price, rating, review }: ITicket,
   ) {
     //await fileManager.setMulterFiles(files).resizeImage().uploadFileToS3();
-    const newFiles = await (await fileManager.setMulterFiles(files).resizeImages()).uploadFileToS3();
+    const newFiles = await (
+      await fileManager.setMulterFiles(files).resizeImages()
+    ).uploadFileToS3();
 
     const result = await this.model.create(userId, newFiles, {
       categoryId,

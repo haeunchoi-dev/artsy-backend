@@ -17,7 +17,7 @@ class UserTicketController {
   @Route('get', '/user/tickets', auth(UserType.user))
   async getTicketList(req: Request, res: Response) {
     const userId = req.params.userId;
-    const { categoryId, perPage, page } = req.query;
+    const { categoryId, limit, lastId } = req.query;
 
     //TODO
     //string to number
@@ -25,13 +25,18 @@ class UserTicketController {
     const ticketList = await this.service.getTicketList(
       userId,
       categoryId ? Number(categoryId) : null,
-      perPage ? Number(perPage) : 0,
-      page ? Number(page) : 0,
+      limit ? Number(limit) : 0,
+      lastId ? Number(lastId) : null,
     );
     return { ...ticketList };
   }
 
-  @Route('post', '/user/ticket', auth(UserType.user), tempImageUpload.array('file'))
+  @Route(
+    'post',
+    '/user/ticket',
+    auth(UserType.user),
+    tempImageUpload.array('file'),
+  )
   async setTicket(req: FileRequest, res: Response) {
     //TODP:body check
     const userId = req.params.userId;
