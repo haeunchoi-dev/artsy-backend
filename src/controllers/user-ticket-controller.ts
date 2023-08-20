@@ -69,7 +69,7 @@ class UserTicketController {
     'put',
     '/user/ticket/:ticketId',
     auth(UserType.user),
-    upload.array('file'),
+    tempImageUpload.array('file'),
   )
   async updateTicket(req: Request, res: Response) {
     const userId = req.params.userId;
