@@ -1,5 +1,5 @@
 export default {
-  '/api/user/login-with-email': {
+  '/api/user/login': {
     post: {
       tags: ['User'],
       summary: '로그인',

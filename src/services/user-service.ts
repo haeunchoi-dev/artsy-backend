@@ -48,7 +48,7 @@ class UserService {
 
     const user = users[0];
     const isCorrectPassword = await bcrypt.compare(password, user.password);
-    if (isCorrectPassword === false) {
+    if (!isCorrectPassword) {
       throw new BadRequestError(
         ERROR_NAMES.INCORRECT_PASSWORD,
         'loginWithEmail - incorrect password',
@@ -56,7 +56,7 @@ class UserService {
     }
 
     const secretKey = process.env.TOKEN_SECRET_KEY;
-    if (secretKey === undefined) {
+    if (!secretKey) {
       throw new InternalServerError(
         ERROR_NAMES.INTERNAL_SERVER_ERROR,
         'loginWithEmail - secretKey === undefined',

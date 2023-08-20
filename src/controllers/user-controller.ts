@@ -14,6 +14,7 @@ class UserController {
   async signUp(req: Request, res: Response) {
     const { displayName, email, password } = req.body;
 
+    // TODO dto
     checker.checkEmailFormat(email);
     checker.checkRequiredStringParams(displayName, password);
 
@@ -24,15 +25,17 @@ class UserController {
   async checkDuplicatedEmail(req: Request, res: Response) {
     const { email } = req.body;
 
+    // TODO dto
     checker.checkEmailFormat(email);
 
     return await this.service.checkDuplicatedEmail(email);
   }
 
-  @Route('post', '/user/login-with-email')
-  async loginWithEmail(req: Request, res: Response) {
+  @Route('post', '/user/login')
+  async login(req: Request, res: Response) {
     const { email, password } = req.body;
 
+    // TODO dto
     checker.checkEmailFormat(email);
     checker.checkRequiredStringParams(password);
 
