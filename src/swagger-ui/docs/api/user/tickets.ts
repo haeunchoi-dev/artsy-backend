@@ -14,7 +14,7 @@ export default {
           },
         },
         {
-          name: 'perPage',
+          name: 'limit',
           in: 'query',
           description: '한 페이지당 ticket 수',
           schema: {
@@ -22,9 +22,9 @@ export default {
           },
         },
         {
-          name: 'page',
+          name: 'lastId',
           in: 'query',
-          description: '페이지 수',
+          description: '페이지 당 마지막 id',
           schema: {
             type: 'int',
           },
