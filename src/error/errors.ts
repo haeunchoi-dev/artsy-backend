@@ -6,6 +6,9 @@ export const ERROR_NAMES = {
   INVALID_PARAM: 'INVALID_PARAM',
   UNAUTHORIZED: 'UNAUTHORIZED',
   FORBIDDEN: 'FORBIDDEN',
+  LIMIT_FILE_SIZE: 'LIMIT_FILE_SIZE',
+  LIMIT_FILE_COUNT: 'LIMIT_FILE_COUNT',
+  DISALLOW_FILE_TYPE: 'DISALLOW_FILE_TYPE',
   INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
 };
 
@@ -30,6 +33,15 @@ const ERRORS = {
   },
   [ERROR_NAMES.FORBIDDEN]: {
     message: 'forbidden'
+  },
+  [ERROR_NAMES.LIMIT_FILE_SIZE]: {
+    message: 'limit file size'
+  },
+  [ERROR_NAMES.LIMIT_FILE_COUNT]: {
+    message: 'limit file count'
+  },
+  [ERROR_NAMES.DISALLOW_FILE_TYPE]: {
+    message: 'disallow file type'
   },
   [ERROR_NAMES.INTERNAL_SERVER_ERROR]: {
     message: 'internal server error'

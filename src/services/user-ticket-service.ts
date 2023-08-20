@@ -2,6 +2,7 @@ import { Injectable } from '@/decorators/di-decorator';
 import TicketModel from '@/models/ticket-model';
 
 import { ITicket } from '@/types/ticket';
+import fileManager from '@/libs/fileManager';
 
 @Injectable()
 class UserTicketService {
@@ -9,7 +10,6 @@ class UserTicketService {
 
   async getTicketList(userId: string, categoryId: number | null) {
     const result = await this.model.findByUserId(userId, { categoryId });
-
     return result;
   }
 
@@ -18,7 +18,10 @@ class UserTicketService {
     files: any[],
     { categoryId, title, showDate, place, price, rating, review }: ITicket,
   ) {
-    const result = await this.model.create(userId, files, {
+    //await fileManager.setMulterFiles(files).resizeImage().uploadFileToS3();
+    const newFiles = await (await fileManager.setMulterFiles(files).resizeImages()).uploadFileToS3();
+
+    const result = await this.model.create(userId, newFiles, {
       categoryId,
       title,
       showDate,
