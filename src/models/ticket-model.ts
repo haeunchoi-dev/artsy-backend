@@ -7,7 +7,12 @@ import db from '@/db';
 class TicketModel {
   constructor() {}
 
-  async findByUserId(userId: string, filter = {}, limit = 0, offset = 0) {
+  async findByUserId(
+    userId: string,
+    filter = {},
+    limit = 0,
+    lastId: number | null,
+  ) {
     const transFilter = objectToArray(filter);
 
     let sql = `SELECT     t.id,
@@ -47,7 +52,13 @@ class TicketModel {
     });
 
     if (limit > 0) {
-      sql += ` LIMIT ${limit} OFFSET ${offset}`;
+      if (lastId) {
+        sql += ` AND t.id > ? order by t.id asc`;
+        transFilter.filterValue.push(lastId);
+      }
+      sql += ` LIMIT ?`;
+
+      transFilter.filterValue.push(limit);
     }
 
     return await db.excuteQuery(async (connection) => {
