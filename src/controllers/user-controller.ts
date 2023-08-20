@@ -57,6 +57,11 @@ class UserController {
     };
   }
 
+  @Route('post', '/user/logout', auth(UserType.user))
+  async logout(req: Request, res: Response) {
+    res.clearCookie('loginToken');
+  }
+
   @Route('get', '/user/info', auth(UserType.user))
   async getUserInfo(req: Request, res: Response) {
     const userId = req.params.userId;
