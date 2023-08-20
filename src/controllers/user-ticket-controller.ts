@@ -2,7 +2,7 @@ import { Injectable } from '@/decorators/di-decorator';
 import { Route } from '@/decorators/route-decorator';
 
 import auth, { UserType } from '@/middlewares/auth';
-import upload from '@/middlewares/multer';
+import { tempImageUpload } from '@/middlewares/multer';
 import UserTicketService from '@/services/user-ticket-service';
 import { Request, Response } from 'express';
 
@@ -31,7 +31,7 @@ class UserTicketController {
     return { ...ticketList };
   }
 
-  @Route('post', '/user/ticket', auth(UserType.user), upload.array('file'))
+  @Route('post', '/user/ticket', auth(UserType.user), tempImageUpload.array('file'))
   async setTicket(req: FileRequest, res: Response) {
     //TODP:body check
     const userId = req.params.userId;

@@ -103,11 +103,11 @@ class TicketModel {
           imageQuery += ` ${i === 0 ? '' : ','}(?, ?, ?, ?, ?, ?, ?, ?, ?)`;
           return [
             ticketId,
-            f.path,
+            f.s3Url,
             f.originalname,
             f.filename,
-            100,
-            100,
+            f.width,
+            f.height,
             f.mimetype,
             f.size,
             i === 0,
