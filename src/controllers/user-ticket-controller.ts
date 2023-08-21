@@ -1,5 +1,6 @@
 import { Injectable } from '@/decorators/di-decorator';
-import { Route } from '@/decorators/route-decorator';
+import { Route, Get, Post, Delete, Put } from '@/decorators/route-decorator';
+import { Body, Query, Param } from '@/decorators/req-decorator';
 
 import auth, { UserType } from '@/middlewares/auth';
 import { tempImageUpload } from '@/middlewares/multer';
@@ -14,19 +15,18 @@ interface FileRequest extends Request {
 class UserTicketController {
   constructor(private readonly service: UserTicketService) {}
 
-  @Route('get', '/user/tickets', auth(UserType.user))
-  async getTicketList(req: Request, res: Response) {
-    const userId = req.params.userId;
-    const { categoryId, limit, lastId } = req.query;
-
-    //TODO
-    //string to number
-
+  @Get('/user/tickets', auth(UserType.user))
+  async getTicketList(
+    @Param('userId') userId: string,
+    @Query('categoryId') categoryId: number,
+    @Query('limit', 0) limit: number,
+    @Query('lastId') lastId: number,
+  ) {
     const ticketList = await this.service.getTicketList(
       userId,
-      categoryId ? Number(categoryId) : null,
-      limit ? Number(limit) : 0,
-      lastId ? Number(lastId) : null,
+      categoryId,
+      limit,
+      lastId,
     );
     return { ...ticketList };
   }
