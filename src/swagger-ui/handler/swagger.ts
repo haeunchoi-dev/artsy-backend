@@ -1,3 +1,5 @@
+import { ISwaggerOption } from './type';
+
 const swaggerOpenApiVersion = '3.0.0';
 
 const swaggerInfo = {
@@ -10,7 +12,7 @@ const swaggerProduces = ['application/json'];
 
 const swaggerServers = [
   {
-    url: process.env.SWAGGER_ID_URL,
+    url: process.env.SWAGGER_ID_URL || 'http://localhost:5000',
   },
 ];
 
@@ -20,15 +22,19 @@ const swaggerTags = [
     description: 'User API',
   },
   {
-    name: 'Member',
-    description: 'Member API',
+    name: 'Category',
+    description: 'Category API',
+  },
+  {
+    name: 'User Ticket',
+    description: 'User Ticket API',
   },
 ];
 
 class Swagger {
-  static #uniqueSwaggerInstance;
+  static #uniqueSwaggerInstance: Swagger;
   #paths = [{}];
-  #option = {};
+  #option: ISwaggerOption = {};
   #setUpOption = {};
 
   /**
@@ -48,6 +54,7 @@ class Swagger {
       definition: {
         openapi: swaggerOpenApiVersion,
         info: swaggerInfo,
+
         servers: swaggerServers,
         produces: swaggerProduces,
         tags: swaggerTags,
@@ -55,17 +62,16 @@ class Swagger {
       apis: [],
     };
     this.#setUpOption = {
-      // search
       explorer: true,
     };
   }
 
-  addAPI(api) {
+  addAPI(api: any) {
     this.#paths.push(api);
   }
 
   #processAPI() {
-    const path = {};
+    const path: Record<string, any> = {};
 
     for (let i = 0; i < this.#paths.length; i += 1) {
       for (const [key, value] of Object.entries(this.#paths[i])) {
@@ -78,7 +84,8 @@ class Swagger {
 
   getOption() {
     const path = this.#processAPI();
-    this.#option.definition.paths = path;
+
+    this.#option.definition!.paths = path;
 
     return {
       apiOption: this.#option,
