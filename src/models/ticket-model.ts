@@ -1,6 +1,7 @@
 import { Injectable } from '@/decorators/di-decorator';
 import objectToArray from '@/libs/objectToArrayForSql';
 import { ITicket } from '@/types/ticket';
+import { IS3ImageFile } from '@/types/image';
 import db from '@/db';
 
 @Injectable()
@@ -78,7 +79,7 @@ class TicketModel {
 
   async create(
     userId: string,
-    files: any[],
+    files: IS3ImageFile[],
     { categoryId, title, showDate, place, price, rating, review }: ITicket,
   ) {
     return await db.excuteQueryWithTransaction(async (connection) => {
