@@ -1,30 +1,44 @@
 import { Expose, Transform } from 'class-transformer';
-import { validateOrReject } from 'class-validator';
+import { validateOrReject, Max, MaxLength, IsNotEmpty } from 'class-validator';
 import BaseDto from './base-dto';
 import { BadRequestError, ERROR_NAMES } from '@/error/errors';
 
 export default class TicketDto extends BaseDto {
-  @Expose()
+  @IsNotEmpty()
   @Transform(({ value }) => Number(value), { toClassOnly: true })
+  @Expose()
   categoryId: number;
+
+  @MaxLength(30)
+  @IsNotEmpty()
   @Expose()
   title: string;
+
+  @IsNotEmpty()
   @Expose()
   showDate: string;
+
+  @MaxLength(30)
   @Expose()
   place: string;
-  @Expose()
+
+  @Max(999999999)
   @Transform(({ value }) => Number(value), { toClassOnly: true })
+  @Expose()
   price: number;
-  @Expose()
+
   @Transform(({ value }) => Number(value), { toClassOnly: true })
+  @Expose()
   rating: number;
+
+  @MaxLength(1000)
   @Expose()
   review: string;
-  @Expose()
+
   @Transform(({ value }) => (value ? Number(value) : null), {
     toClassOnly: true,
   })
+  @Expose()
   removeFileId: number;
 
   async validate(): Promise<void> {

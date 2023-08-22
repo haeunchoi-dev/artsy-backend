@@ -21,12 +21,13 @@ class TicketModel {
                           c.name as categoryName,  
                           c.color as categoryColor, 
                           t.title,
-                          CONVERT_TZ(t.show_date, '+00:00', '+09:00') as showDate,
+                          t.show_date as showDate,
+                          DATE_FORMAT(t.show_date, '%Y-%m-%d %H:%i') as showDateString,
                           t.place,
                           t.price,
                           t.rating,
                           t.review,
-                          CONVERT_TZ(t.create_date, '+00:00', '+09:00') as createDate,
+                          t.create_date as createDate,
                           t.update_date as updateDate,
                           i.id as "fileId",
                           i.image_url as "fileImageUrl",
@@ -37,7 +38,7 @@ class TicketModel {
                           i.extension as "fileExtension",
                           i.file_size as "fileSize",
                           i.is_primary as "fileIsPrimary",
-                          CONVERT_TZ(i.create_date, '+00:00', '+09:00') as "fileCreateDate"                      
+                          i.create_date as "fileCreateDate"                      
                 FROM ticket t
                 LEFT JOIN category c ON t.category_id = c.id 
                 LEFT JOIN image i ON t.id = i.ticket_id AND i.is_primary = 1
@@ -141,12 +142,13 @@ class TicketModel {
                   c.name as categoryName,  
                   c.color as categoryColor, 
                   t.title,
-                  CONVERT_TZ(t.show_date, '+00:00', '+09:00') as showDate,
+                  t.show_date as showDate,
+                  DATE_FORMAT(t.show_date, '%Y-%m-%d %H:%i') as showDateString,
                   t.place,
                   t.price,
                   t.rating,
                   t.review,
-                  CONVERT_TZ(t.create_date, '+00:00', '+09:00') as createDate,
+                  t.create_date as createDate,
                   t.update_date as updateDate
                 FROM ticket t
                 LEFT JOIN category c ON t.category_id = c.id 
@@ -167,7 +169,7 @@ class TicketModel {
                 extension,
                 file_size as fileSize,
                 is_primary as isPrimary,
-                CONVERT_TZ(create_date, '+00:00', '+09:00') as createDate
+                create_date as createDate
                 from image 
                 where ticket_id = ?`,
         [ticket.id],

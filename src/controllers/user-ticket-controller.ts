@@ -33,16 +33,7 @@ class UserTicketController {
     @Body() ticketDto: TicketDto,
     @Req('files', []) files: Express.Multer.File[],
   ) {
-    console.log({ userId, ticketDto, files });
-    return await this.service.setTicket(userId, files, {
-      categoryId: ticketDto.categoryId,
-      title: ticketDto.title,
-      showDate: ticketDto.showDate,
-      place: ticketDto.place,
-      price: ticketDto.price,
-      rating: ticketDto.rating,
-      review: ticketDto.review,
-    });
+    return await this.service.setTicket(userId, files, ticketDto);
   }
 
   @Get('/user/ticket/:ticketId', auth(UserType.user))
@@ -64,16 +55,7 @@ class UserTicketController {
     @Body() ticketDto: TicketDto,
     @Req('files', []) files: Express.Multer.File[],
   ) {
-    return await this.service.updateTicket(userId, ticketId, files, {
-      categoryId: ticketDto.categoryId,
-      title: ticketDto.title,
-      showDate: ticketDto.showDate,
-      place: ticketDto.place,
-      price: ticketDto.price,
-      rating: ticketDto.rating,
-      review: ticketDto.review,
-      removeFileId: ticketDto.removeFileId,
-    });
+    return await this.service.updateTicket(userId, ticketId, files, ticketDto);
   }
 
   @Delete('/user/ticket/:ticketId', auth(UserType.user))
