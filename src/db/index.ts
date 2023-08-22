@@ -31,7 +31,8 @@ export class Database {
       (async () => {
         const _pool = await pool;
         _pool.on('connection', (connection) => {
-          //connection.config.debug = true;
+          connection.config.debug = true;
+          //connection.config.dateStrings = true;
         });
       })();
     }

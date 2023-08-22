@@ -21,12 +21,12 @@ class TicketModel {
                           c.name as categoryName,  
                           c.color as categoryColor, 
                           t.title,
-                          t.show_date as showDate,
+                          CONVERT_TZ(t.show_date, '+00:00', '+09:00') as showDate,
                           t.place,
                           t.price,
                           t.rating,
                           t.review,
-                          t.create_date as createDate,
+                          CONVERT_TZ(t.create_date, '+00:00', '+09:00') as createDate,
                           t.update_date as updateDate,
                           i.id as "fileId",
                           i.image_url as "fileImageUrl",
@@ -37,7 +37,7 @@ class TicketModel {
                           i.extension as "fileExtension",
                           i.file_size as "fileSize",
                           i.is_primary as "fileIsPrimary",
-                          i.create_date as "fileCreateDate"                      
+                          CONVERT_TZ(i.create_date, '+00:00', '+09:00') as "fileCreateDate"                      
                 FROM ticket t
                 LEFT JOIN category c ON t.category_id = c.id 
                 LEFT JOIN image i ON t.id = i.ticket_id AND i.is_primary = 1
@@ -141,12 +141,12 @@ class TicketModel {
                   c.name as categoryName,  
                   c.color as categoryColor, 
                   t.title,
-                  t.show_date as showDate,
+                  CONVERT_TZ(t.show_date, '+00:00', '+09:00') as showDate,
                   t.place,
                   t.price,
                   t.rating,
                   t.review,
-                  t.create_date as createDate,
+                  CONVERT_TZ(t.create_date, '+00:00', '+09:00') as createDate,
                   t.update_date as updateDate
                 FROM ticket t
                 LEFT JOIN category c ON t.category_id = c.id 
@@ -167,7 +167,7 @@ class TicketModel {
                 extension,
                 file_size as fileSize,
                 is_primary as isPrimary,
-                create_date as createDate
+                CONVERT_TZ(create_date, '+00:00', '+09:00') as createDate
                 from image 
                 where ticket_id = ?`,
         [ticket.id],
@@ -179,7 +179,7 @@ class TicketModel {
 
   async update(
     ticketId: number,
-    files: Express.Multer.File[],
+    files: IS3ImageFile[],
     {
       categoryId,
       title,
@@ -207,16 +207,64 @@ class TicketModel {
         [categoryId, title, showDate, place, price, rating, review, ticketId],
       );
 
-      if (files.length > 0) {
+      let deleteFile = [];
+      if (files.length > 0 || removeFileId) {
+        deleteFile = await connection.query(
+          `select id,
+                  ticket_id as ticketId,
+                  image_url as imageUrl,
+                  original_name as originalName,
+                  file_name as fileName,
+                  width,
+                  height,
+                  extension,
+                  file_size as fileSize,
+                  is_primary as isPrimary,
+                  create_date as createDate
+                  from image 
+                  where ticket_id = ?
+                  `,
+          [ticketId],
+        );
+
         // 기존 파일 삭제
-        // 새 파일 추가
+        await connection.query(`DELETE FROM image WHERE ticket_id = ? `, [
+          ticketId,
+        ]);
       }
 
-      //삭제할 파일 id가 있다면 기존파일 삭제
+      // 새 파일 추가
+      if (files.length > 0) {
+        let imageQuery = `INSERT INTO image (
+          ticket_id,
+          image_url,
+          original_name,
+          file_name,
+          width,
+          height,
+          extension,
+          file_size,
+          is_primary) VALUES`;
 
-      //리턴으로 삭제할 파일 정보 보낼것
+        const imageInsertValues = files.flatMap((f, i) => {
+          imageQuery += ` ${i === 0 ? '' : ','}(?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+          return [
+            ticketId,
+            f.s3Url,
+            f.originalname,
+            f.filename,
+            f.width,
+            f.height,
+            f.mimetype,
+            f.size,
+            i === 0,
+          ];
+        });
 
-      return { id: ticketId };
+        await connection.query(imageQuery, imageInsertValues);
+      }
+
+      return deleteFile;
     });
   }
 
