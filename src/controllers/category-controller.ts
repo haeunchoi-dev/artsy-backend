@@ -1,8 +1,6 @@
-import { Request, Response } from 'express';
-
 import { Injectable } from '@/decorators/di-decorator';
-import { Route } from '@/decorators/route-decorator';
-import checker from '@/libs/checker';
+import { Get, Post, Delete, Put } from '@/decorators/route-decorator';
+import { Body, Query, Param } from '@/decorators/req-binding-decorator';
 
 import CategoryService from '@/services/category-service';
 
@@ -10,19 +8,14 @@ import CategoryService from '@/services/category-service';
 class CategoryController {
   constructor(private readonly service: CategoryService) {}
 
-  @Route('get', '/categories')
-  async getAllCategories(req: Request, res: Response) {
+  @Get('/categories')
+  async getAllCategories() {
     return await this.service.getAllCategories();
   }
 
-  @Route('get', '/categories/:categoryId')
-  async getCategory(req: Request, res: Response) {
-    const { categoryId } = req.params;
-
-    // TODO dto
-    checker.checkRequiredPositiveIntegerParams(Number(categoryId));
-
-    return await this.service.getCategory(Number(categoryId));
+  @Get('/categories/:categoryId')
+  async getCategory(@Param('categoryId') categoryId: number) {
+    return await this.service.getCategory(categoryId);
   }
 }
 
