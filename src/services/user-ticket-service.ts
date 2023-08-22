@@ -2,9 +2,9 @@ import { Injectable } from '@/decorators/di-decorator';
 import { BadRequestError, ERROR_NAMES, ForbiddenError } from '@/error/errors';
 import TicketModel from '@/models/ticket-model';
 
-import { ITicket } from '@/types/ticket';
 import { IResDBImageFile, IS3ImageFile } from '@/types/image';
 import fileManager from '@/libs/fileManager';
+import TicketDto from '@/dto/ticket-dto';
 
 @Injectable()
 class UserTicketService {
@@ -22,7 +22,7 @@ class UserTicketService {
   async setTicket(
     userId: string,
     files: Express.Multer.File[],
-    { categoryId, title, showDate, place, price, rating, review }: ITicket,
+    { categoryId, title, showDate, place, price, rating, review }: TicketDto,
   ) {
     const newFiles: IS3ImageFile[] =
       await fileManager.convertTempImageToS3Image(files);
@@ -79,7 +79,7 @@ class UserTicketService {
       rating,
       review,
       removeFileId,
-    }: ITicket,
+    }: TicketDto,
   ) {
     const ticket = await this.model.findUserIdById(ticketId);
 
