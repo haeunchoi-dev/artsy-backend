@@ -179,12 +179,17 @@ class TicketModel {
 
   async update(
     ticketId: number,
-    files:
-      | Express.Multer.File[]
-      | {
-          [fieldname: string]: Express.Multer.File[];
-        },
-    { categoryId, title, showDate, place, price, rating, review }: ITicket,
+    files: Express.Multer.File[],
+    {
+      categoryId,
+      title,
+      showDate,
+      place,
+      price,
+      rating,
+      review,
+      removeFileId,
+    }: ITicket,
   ) {
     return await db.excuteQueryWithTransaction(async (connection) => {
       await connection.query(
@@ -201,6 +206,15 @@ class TicketModel {
             id = ?`,
         [categoryId, title, showDate, place, price, rating, review, ticketId],
       );
+
+      if (files.length > 0) {
+        // 기존 파일 삭제
+        // 새 파일 추가
+      }
+
+      //삭제할 파일 id가 있다면 기존파일 삭제
+
+      //리턴으로 삭제할 파일 정보 보낼것
 
       return { id: ticketId };
     });
