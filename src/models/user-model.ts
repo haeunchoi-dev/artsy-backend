@@ -46,7 +46,7 @@ class UserModel {
         SELECT
           u.display_name as displayName,
           u.email,
-          u.create_date as createdDate,
+          CONVERT_TZ(u.create_date, '+00:00', '+09:00') as createdDate,
           count(t.id) as totalTicket
         FROM user u
         LEFT JOIN ticket t ON t.user_id  = u.id 
