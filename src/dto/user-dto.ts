@@ -5,12 +5,13 @@ import BaseDto from './base-dto';
 import { BadRequestError, ERROR_NAMES } from '@/error/errors';
 
 export class SignUpDto extends BaseDto {
-  // TODO 흠 얘 문젠데
   @Expose()
   @IsNotEmpty()
   @IsString()
-  //@Transform(({ value }: TransformFnParams) => value?.trim())
   @Length(2, 30)
+  @Transform(({ value }: TransformFnParams) => {
+    if (typeof(value) === 'string') return value.trim();
+  })
   displayName: string;
 
   @Expose()
@@ -22,7 +23,10 @@ export class SignUpDto extends BaseDto {
   @Expose()
   @IsNotEmpty()
   @IsString()
-  //@Length(2, 30)
+  //@IsNotIn(values: any[])
+  //@NotContains(seed: string)
+  //@Matches(pattern: RegExp, modifiers?: string)
+  @Length(4, 30)
   password: string;
 
   async validate(): Promise<void> {
@@ -59,7 +63,10 @@ export class LoginDto extends BaseDto {
   @Expose()
   @IsNotEmpty()
   @IsString()
-  //@Length(2, 30)
+  //@IsNotIn(values: any[])
+  //@NotContains(seed: string)
+  //@Matches(pattern: RegExp, modifiers?: string)
+  @Length(4, 30)
   password: string;
 
   async validate(): Promise<void> {
