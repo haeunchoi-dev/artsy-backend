@@ -6,4 +6,5 @@ export interface ITicket {
   price: number;
   rating: number;
   review: string;
+  removeFileId?: number;
 }

@@ -1,15 +1,11 @@
 import { Injectable } from '@/decorators/di-decorator';
-import { Route, Get, Post, Delete, Put } from '@/decorators/route-decorator';
-import { Body, Query, Param } from '@/decorators/req-decorator';
+import { Get, Post, Delete, Put } from '@/decorators/route-decorator';
+import { Body, Query, Param, Req } from '@/decorators/req-binding-decorator';
 
 import auth, { UserType } from '@/middlewares/auth';
 import { tempImageUpload } from '@/middlewares/multer';
 import UserTicketService from '@/services/user-ticket-service';
-import { Request, Response } from 'express';
-
-interface FileRequest extends Request {
-  files?: any;
-}
+import TicketDto from '@/dto/ticket-dto';
 
 @Injectable()
 class UserTicketController {
@@ -31,96 +27,72 @@ class UserTicketController {
     return { ...ticketList };
   }
 
-  @Route(
-    'post',
-    '/user/ticket',
-    auth(UserType.user),
-    tempImageUpload.array('file'),
-  )
-  async setTicket(req: FileRequest, res: Response) {
-    //TODP:body check
-    const userId = req.params.userId;
-    const files = req.files || [];
-
-    const { categoryId, title, showDate, place, price, rating, review } =
-      req.body;
-
-    //TODO
-    // string to number
-
+  @Post('/user/ticket', auth(UserType.user), tempImageUpload.array('file'))
+  async setTicket(
+    @Param('userId') userId: string,
+    @Body() ticketDto: TicketDto,
+    @Req('files', []) files: Express.Multer.File[],
+  ) {
+    console.log({ userId, ticketDto, files });
     return await this.service.setTicket(userId, files, {
-      categoryId: Number(categoryId),
-      title,
-      showDate,
-      place,
-      price: Number(price),
-      rating: Number(rating),
-      review,
+      categoryId: ticketDto.categoryId,
+      title: ticketDto.title,
+      showDate: ticketDto.showDate,
+      place: ticketDto.place,
+      price: ticketDto.price,
+      rating: ticketDto.rating,
+      review: ticketDto.review,
     });
   }
 
-  @Route('get', '/user/ticket/:ticketId', auth(UserType.user))
-  async getTicket(req: Request, res: Response) {
-    const userId = req.params.userId;
-    const { ticketId } = req.params;
-
-    //TODO
-    //string to number
-
-    return await this.service.getTicket(userId, Number(ticketId));
+  @Get('/user/ticket/:ticketId', auth(UserType.user))
+  async getTicket(
+    @Param('userId') userId: string,
+    @Param('ticketId') ticketId: number,
+  ) {
+    return await this.service.getTicket(userId, ticketId);
   }
 
-  @Route(
-    'put',
+  @Put(
     '/user/ticket/:ticketId',
     auth(UserType.user),
     tempImageUpload.array('file'),
   )
-  async updateTicket(req: Request, res: Response) {
-    const userId = req.params.userId;
-    const { ticketId } = req.params;
-    const files = req.files || [];
-
-    const { categoryId, title, showDate, place, price, rating, review } =
-      req.body;
-
-    //TODO
-    // string to number
-
-    return await this.service.updateTicket(userId, Number(ticketId), files, {
-      categoryId: Number(categoryId),
-      title,
-      showDate,
-      place,
-      price: Number(price),
-      rating: Number(rating),
-      review,
+  async updateTicket(
+    @Param('userId') userId: string,
+    @Param('ticketId') ticketId: number,
+    @Body() ticketDto: TicketDto,
+    @Req('files', []) files: Express.Multer.File[],
+  ) {
+    return await this.service.updateTicket(userId, ticketId, files, {
+      categoryId: ticketDto.categoryId,
+      title: ticketDto.title,
+      showDate: ticketDto.showDate,
+      place: ticketDto.place,
+      price: ticketDto.price,
+      rating: ticketDto.rating,
+      review: ticketDto.review,
+      removeFileId: ticketDto.removeFileId,
     });
   }
 
-  @Route('delete', '/user/ticket/:ticketId', auth(UserType.user))
-  async deleteTicket(req: Request, res: Response) {
-    const userId = req.params.userId;
-    const { ticketId } = req.params;
-
-    const ticket = await this.service.deleteTicket(userId, Number(ticketId));
+  @Delete('/user/ticket/:ticketId', auth(UserType.user))
+  async deleteTicket(
+    @Param('userId') userId: string,
+    @Param('ticketId') ticketId: number,
+  ) {
+    const ticket = await this.service.deleteTicket(userId, ticketId);
 
     return ticket;
   }
 
-  @Route('get', '/user/ticket-total-count', auth(UserType.user))
-  async getTicketTotalCount(req: Request, res: Response) {
-    const userId = req.params.userId;
-
-    // TODO Checker
+  @Get('/user/ticket-total-count', auth(UserType.user))
+  async getTicketTotalCount(@Param('userId') userId: string) {
     return await this.service.getTicketTotalCount(userId);
   }
 
-  @Route('get', '/user/ticket-total-price', auth(UserType.user))
-  async getTicketTotalPrice(req: Request, res: Response) {
-    const userId = req.params.userId;
-
-    // TODO Checker
+  @Get('/user/ticket-total-price', auth(UserType.user))
+  async getTicketTotalPrice(@Param('userId') userId: string) {
     return await this.service.getTicketTotalPrice(userId);
   }
 }
