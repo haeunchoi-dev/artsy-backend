@@ -8,7 +8,8 @@ import UserService from '@/services/user-service';
 import {
   SignUpDto,
   CheckDuplicatedEmailDto,
-  LoginDto
+  LoginDto,
+  //UserDisplayNameDto
 } from '@/dto/user-dto';
 
 @Injectable()
@@ -58,6 +59,12 @@ class UserController {
   async getUserInfo(@Param('userId') userId: string) {
     return await this.service.getUserInfo(userId);
   }
+
+  //@Put('/user/display-name', auth(UserType.user))
+  //async updateUserDisplayName(@Body() dto: UserDisplayNameDto) {
+  //  const { displayName } = dto;
+  //  console.log('displayName', displayName);
+  //}
 }
 
 export default UserController;
