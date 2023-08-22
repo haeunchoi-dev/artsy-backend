@@ -38,7 +38,7 @@ function commonRouter(
 
   const originalMethod = descriptor.value;
   descriptor.value = async function (...args: any[]) {
-    const req = args[0];
+    const request = args[0];
 
     const bodys: any[] =
       Reflect.getOwnMetadata('REQ_BODY_METADATA', target, propertyKey) || [];
@@ -46,8 +46,10 @@ function commonRouter(
       Reflect.getOwnMetadata('REQ_QUERY_METADATA', target, propertyKey) || [];
     const params: any[] =
       Reflect.getOwnMetadata('REQ_PARAM_METADATA', target, propertyKey) || [];
+    const reqs: any[] =
+      Reflect.getOwnMetadata('REQ_METADATA', target, propertyKey) || [];
 
-    const reqBody = req.body;
+    const reqBody = request.body;
     for (let { index, type } of bodys) {
       const dto = plainToClass(type, reqBody, {
         excludeExtraneousValues: true,
@@ -57,18 +59,22 @@ function commonRouter(
       args[index] = dto;
     }
 
-    const reqQuery = req.query;
+    const reqQuery = request.query;
     for (let { index, key, defaultValue, parameterType } of querys) {
       args[index] = reqQuery.hasOwnProperty(key)
         ? parameterType(reqQuery[key])
         : defaultValue;
     }
 
-    const reqParams = req.params;
+    const reqParams = request.params;
     for (let { index, key, defaultValue, parameterType } of params) {
       args[index] = reqParams.hasOwnProperty(key)
         ? parameterType(reqParams[key])
         : defaultValue;
+    }
+
+    for (let { index, key, defaultValue } of reqs) {
+      args[index] = request.hasOwnProperty(key) ? request[key] : defaultValue;
     }
 
     return await originalMethod.apply(this, args);
