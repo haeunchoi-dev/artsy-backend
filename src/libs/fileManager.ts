@@ -1,19 +1,14 @@
 import fs from 'fs/promises'
 import { createReadStream } from 'fs'
 import sharp from 'sharp';
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
-interface IS3File extends Express.Multer.File {
-  s3Url?: string;
-  width?: number;
-  height?: number;
-}
+import { IS3ImageFile } from '@/types/image';
 
 class FileManager {
   private s3: S3Client;
   private s3_region: string;
   private s3_bucket_name: string;
-  private files: IS3File[] = [];
 
   constructor() {
     const s3_region = process.env.S3_REGION;
@@ -37,22 +32,40 @@ class FileManager {
     });
   }
 
-  public setMulterFiles(files: Express.Multer.File[]): FileManager {
-    this.files = files;
-    return this;
+  public async convertTempImageToS3Image(imageFiles: Express.Multer.File[]): Promise<IS3ImageFile[]> {
+    const resizedImages = await this.resizeImages(imageFiles);
+    const uploadedImages = await this.uploadImageFileToS3(resizedImages);
+    return uploadedImages;
   }
 
-  private async resizeImage(file: Express.Multer.File): Promise<IS3File> {
+  private async resizeImages(imageFiles: Express.Multer.File[]): Promise<IS3ImageFile[]> {
+    
+    
+    
+    
     try {
-      const { data, info } = await sharp(file.path)
+      const resizedImages = await Promise.all(imageFiles.map(item => this.resizeImage(item)));
+      return resizedImages;
+
+    } catch (error) {
+      throw error;
+    }
+    
+    
+    
+  }
+
+  private async resizeImage(imageFile: Express.Multer.File): Promise<IS3ImageFile> {
+    try {
+      const { data, info } = await sharp(imageFile.path)
                                     .resize({ width: 600, fit: 'inside', withoutEnlargement: true })
                                     .withMetadata()
                                     .toBuffer({ resolveWithObject: true });
 
-      await fs.writeFile(file.path, data);
+      await fs.writeFile(imageFile.path, data);
 
       return {
-        ...file,
+        ...imageFile,
         s3Url: '',
         width: info.width,
         height: info.height,
@@ -64,21 +77,8 @@ class FileManager {
     }
   }
 
-  public async resizeImages(): Promise<FileManager> {
-    try {
-      const _files = this.files;
-      this.files = await Promise.all(_files.map(item => this.resizeImage(item)));
-      return this;
-
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  public async uploadFileToS3(): Promise<IS3File[]> {
-    const _files = this.files;
-
-    const promiseList = _files.map(async (file) => {
+  private async uploadImageFileToS3(s3ImageFiles: IS3ImageFile[]): Promise<IS3ImageFile[]> {
+    const promiseList = s3ImageFiles.map(async (file) => {
       const fileStream = createReadStream(file.path);
       const encodeFileName = encodeURIComponent(file.filename);
 
@@ -101,11 +101,51 @@ class FileManager {
 
     const newFiles = await Promise.all(promiseList);
 
-    for (let i = 0; i < _files.length; i++) {
-      fs.unlink(_files[i].path);
+    for (let i = 0; i < s3ImageFiles.length; i++) {
+      fs.unlink(s3ImageFiles[i].path);
     }
 
     return newFiles;
+  }
+
+  public async deleteS3Files(fileKeys: string[]) {
+    for (const key of fileKeys) {
+      const bucketParams = {
+        Bucket: this.s3_bucket_name,
+        Key: key
+      };
+
+      try {
+        const data = await this.s3.send(new DeleteObjectCommand(bucketParams));
+        //console.log("Success. Object deleted.", data);
+        //Success. Object deleted. {
+        //  '$metadata': {
+        //    httpStatusCode: 204,
+        //    requestId: 'G4KYYBVHWQFRTC0S',
+        //    extendedRequestId: 'gE9KTltIZ6m1nlMaJEPNzHnZAiaOD37EdFZGbS9xpvrzBDtHzggBMuq7n5jsIbaO/0IjFVqoCq8=',
+        //    cfId: undefined,
+        //    attempts: 1,
+        //    totalRetryDelay: 0
+        //  }
+        //}
+        
+        // 없는 키 전송했는데
+        //Success. Object deleted. {
+        //  '$metadata': {
+        //    httpStatusCode: 204,
+        //    requestId: '6FPR5J4PMVT5NYZE',
+        //    extendedRequestId: 'Y2U7PTF9rR+SvubkEo7trvlYXwFR5KbM6YoLKSroi+qWugv6PA344paGAqdC6zxGBi5XkLSOApo=',
+        //    cfId: undefined,
+        //    attempts: 1,
+        //    totalRetryDelay: 0
+        //  }
+        //}
+
+      } catch (error) {
+        // TODO S3에서 파일 삭제 실패 핸들링인데 성공으로 왜 뜰까?
+        console.log('삭제 에러 발생', error);
+      }
+    }
   }
 }
 

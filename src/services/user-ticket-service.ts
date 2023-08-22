@@ -3,6 +3,7 @@ import { BadRequestError, ERROR_NAMES, ForbiddenError } from '@/error/errors';
 import TicketModel from '@/models/ticket-model';
 
 import { ITicket } from '@/types/ticket';
+import { IResDBImageFile } from '@/types/image';
 import fileManager from '@/libs/fileManager';
 
 @Injectable()
@@ -20,13 +21,10 @@ class UserTicketService {
 
   async setTicket(
     userId: string,
-    files: any[],
+    files: Express.Multer.File[],
     { categoryId, title, showDate, place, price, rating, review }: ITicket,
   ) {
-    //await fileManager.setMulterFiles(files).resizeImage().uploadFileToS3();
-    const newFiles = await (
-      await fileManager.setMulterFiles(files).resizeImages()
-    ).uploadFileToS3();
+    const newFiles = await fileManager.convertTempImageToS3Image(files);
 
     const result = await this.model.create(userId, newFiles, {
       categoryId,
@@ -117,9 +115,9 @@ class UserTicketService {
       throw new ForbiddenError(ERROR_NAMES.FORBIDDEN, 'not found ticket.');
     }
 
-    const result = await this.model.deleteById(ticketId);
-
-    //파일서버 파일 삭제
+    const result: IResDBImageFile[] = await this.model.deleteById(ticketId);
+    const deleteFileKeys = result.map(file => file.fileName);
+    fileManager.deleteS3Files(deleteFileKeys);
 
     return result;
   }
