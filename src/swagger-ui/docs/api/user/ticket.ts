@@ -303,6 +303,11 @@ export default {
                     format: 'binary',
                   },
                 },
+                removeFileId: {
+                  type: 'int',
+                  description: '삭제된 file id',
+                  example: 1,
+                },
               },
             },
           },

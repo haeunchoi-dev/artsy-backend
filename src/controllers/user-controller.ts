@@ -6,7 +6,7 @@ import { Body, Query, Param } from '@/decorators/req-binding-decorator';
 import checker from '@/libs/checker';
 
 import UserService from '@/services/user-service';
-import { SignUpDto, CheckDuplicatedEmailDto} from '@/dto/user-dto';
+import { SignUpDto, CheckDuplicatedEmailDto } from '@/dto/user-dto';
 
 @Injectable()
 class UserController {

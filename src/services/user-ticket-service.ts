@@ -3,7 +3,7 @@ import { BadRequestError, ERROR_NAMES, ForbiddenError } from '@/error/errors';
 import TicketModel from '@/models/ticket-model';
 
 import { ITicket } from '@/types/ticket';
-import { IResDBImageFile } from '@/types/image';
+import { IResDBImageFile, IS3ImageFile } from '@/types/image';
 import fileManager from '@/libs/fileManager';
 
 @Injectable()
@@ -24,7 +24,8 @@ class UserTicketService {
     files: Express.Multer.File[],
     { categoryId, title, showDate, place, price, rating, review }: ITicket,
   ) {
-    const newFiles = await fileManager.convertTempImageToS3Image(files);
+    const newFiles: IS3ImageFile[] =
+      await fileManager.convertTempImageToS3Image(files);
 
     const result = await this.model.create(userId, newFiles, {
       categoryId,
@@ -93,18 +94,26 @@ class UserTicketService {
       throw new ForbiddenError(ERROR_NAMES.FORBIDDEN, 'not found ticket.');
     }
 
-    const result = await this.model.update(ticketId, files, {
-      categoryId,
-      title,
-      showDate,
-      place,
-      price,
-      rating,
-      review,
-      removeFileId,
-    });
+    const newFiles: IS3ImageFile[] =
+      await fileManager.convertTempImageToS3Image(files);
 
-    //파일 삭제
+    const result: IResDBImageFile[] = await this.model.update(
+      ticketId,
+      newFiles,
+      {
+        categoryId,
+        title,
+        showDate,
+        place,
+        price,
+        rating,
+        review,
+        removeFileId,
+      },
+    );
+
+    const deleteFileKeys = result.map((file) => file.fileName);
+    fileManager.deleteS3Files(deleteFileKeys);
 
     return result;
   }
