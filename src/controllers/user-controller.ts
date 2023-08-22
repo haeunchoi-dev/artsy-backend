@@ -1,24 +1,33 @@
 import { Request, Response } from 'express';
 import auth, { UserType } from '@/middlewares/auth';
 import { Injectable } from '@/decorators/di-decorator';
-import { Route } from '@/decorators/route-decorator';
+import { Route, Get, Post, Delete, Put } from '@/decorators/route-decorator';
+import { Body, Query, Param } from '@/decorators/req-decorator';
 import checker from '@/libs/checker';
 
 import UserService from '@/services/user-service';
+import SignupDto from '@/dto/signup-dto';
 
 @Injectable()
 class UserController {
   constructor(private readonly service: UserService) {}
 
-  @Route('post', '/user/sign-up')
-  async signUp(req: Request, res: Response) {
-    const { displayName, email, password } = req.body;
+  @Post('/user/sign-up')
+  async signUp(@Body() signupDto: SignupDto) {
+    console.log(signupDto);
 
     // TODO dto
-    checker.checkEmailFormat(email);
-    checker.checkRequiredStringParams(displayName, password);
+    // checker.checkEmailFormat(signupDto.email);
+    // checker.checkRequiredStringParams(
+    //   signupDto.displayName,
+    //   signupDto.password,
+    // );
 
-    await this.service.signUpWithEmail(displayName, email, password);
+    await this.service.signUpWithEmail(
+      signupDto.displayName,
+      signupDto.email,
+      signupDto.password,
+    );
   }
 
   @Route('post', '/user/check-duplicated-email')

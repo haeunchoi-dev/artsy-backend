@@ -68,12 +68,17 @@ class UserTicketService {
   async updateTicket(
     userId: string,
     ticketId: number,
-    files:
-      | Express.Multer.File[]
-      | {
-          [fieldname: string]: Express.Multer.File[];
-        },
-    { categoryId, title, showDate, place, price, rating, review }: ITicket,
+    files: Express.Multer.File[],
+    {
+      categoryId,
+      title,
+      showDate,
+      place,
+      price,
+      rating,
+      review,
+      removeFileId,
+    }: ITicket,
   ) {
     const ticket = await this.model.findUserIdById(ticketId);
 
@@ -96,7 +101,10 @@ class UserTicketService {
       price,
       rating,
       review,
+      removeFileId,
     });
+
+    //파일 삭제
 
     return result;
   }
@@ -116,7 +124,7 @@ class UserTicketService {
     }
 
     const result: IResDBImageFile[] = await this.model.deleteById(ticketId);
-    const deleteFileKeys = result.map(file => file.fileName);
+    const deleteFileKeys = result.map((file) => file.fileName);
     fileManager.deleteS3Files(deleteFileKeys);
 
     return result;
