@@ -18,6 +18,7 @@ export class SignUpDto extends BaseDto {
   @IsEmail()
   email: string;
 
+  // TODO
   @Expose()
   @IsNotEmpty()
   @IsString()
@@ -38,6 +39,28 @@ export class CheckDuplicatedEmailDto extends BaseDto {
   @IsNotEmpty()
   @IsEmail()
   email: string;
+
+  async validate(): Promise<void> {
+    try {
+      await validateOrReject(this, { forbidUnknownValues: true });
+    } catch (error) {
+      throw new BadRequestError(ERROR_NAMES.INVALID_PARAM, error);
+    }
+  }
+}
+
+export class LoginDto extends BaseDto {
+  @Expose()
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
+  // TODO
+  @Expose()
+  @IsNotEmpty()
+  @IsString()
+  //@Length(2, 30)
+  password: string;
 
   async validate(): Promise<void> {
     try {

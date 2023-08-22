@@ -1,12 +1,15 @@
 import { Request, Response } from 'express';
 import auth, { UserType } from '@/middlewares/auth';
 import { Injectable } from '@/decorators/di-decorator';
-import { Route, Get, Post, Delete, Put } from '@/decorators/route-decorator';
+import { Get, Post, Delete, Put } from '@/decorators/route-decorator';
 import { Body, Query, Param } from '@/decorators/req-binding-decorator';
-import checker from '@/libs/checker';
 
 import UserService from '@/services/user-service';
-import { SignUpDto, CheckDuplicatedEmailDto } from '@/dto/user-dto';
+import {
+  SignUpDto,
+  CheckDuplicatedEmailDto,
+  LoginDto
+} from '@/dto/user-dto';
 
 @Injectable()
 class UserController {
@@ -24,13 +27,9 @@ class UserController {
     return await this.service.checkDuplicatedEmail(email);
   }
 
-  @Route('post', '/user/login')
-  async login(req: Request, res: Response) {
-    const { email, password } = req.body;
-
-    // TODO dto
-    checker.checkEmailFormat(email);
-    checker.checkRequiredStringParams(password);
+  @Post('/user/login')
+  async login(@Body() dto: LoginDto, res: Response) {
+    const { email, password } = dto;
 
     const result = await this.service.loginWithEmail(email, password);
 
@@ -50,14 +49,13 @@ class UserController {
     };
   }
 
-  @Route('post', '/user/logout', auth(UserType.user))
-  async logout(req: Request, res: Response) {
+  @Post('/user/logout', auth(UserType.user))
+  async logout(_: Request, res: Response) {
     res.clearCookie('loginToken');
   }
 
-  @Route('get', '/user/info', auth(UserType.user))
-  async getUserInfo(req: Request, res: Response) {
-    const userId = req.params.userId;
+  @Get('/user/info', auth(UserType.user))
+  async getUserInfo(@Param('userId') userId: string) {
     return await this.service.getUserInfo(userId);
   }
 }
