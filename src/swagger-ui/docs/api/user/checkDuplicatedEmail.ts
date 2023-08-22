@@ -1,29 +1,19 @@
 export default {
-  '/api/user/login': {
+  '/api/user/check-duplicated-email': {
     post: {
       tags: ['User'],
-      summary: '로그인',
-      description: '로그인',
+      summary: '이메일 중복 확인',
+      description: '이메일 중복 확인',
       requestBody: {
         content: {
           'application/json': {
             schema: {
               type: 'object',
               properties: {
-                displayName: {
-                  type: 'string',
-                  description: 'email',
-                  example: 'test@test.com',
-                },
                 email: {
                   type: 'string',
                   description: 'email',
                   example: 'test@test.com',
-                },
-                password: {
-                  type: 'string',
-                  description: 'password',
-                  example: '###',
                 },
               },
             },
@@ -32,15 +22,25 @@ export default {
       },
       responses: {
         200: {
-          description: '로그인 완료',
+          description: '이메일 중복 확인',
           content: {
             'application/json': {
               schema: {
                 type: 'object',
                 properties: {
-                  token: {
-                    type: 'string',
-                    description: 'token',
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
+                  artsyData: {
+                    type: 'object',
+                    properties: {
+                      isExists: {
+                        type: 'boolean',
+                        //description: 'true',
+                        example: true,
+                      },
+                    },
                   },
                 },
               },
