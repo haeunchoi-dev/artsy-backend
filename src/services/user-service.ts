@@ -80,6 +80,10 @@ class UserService {
   async getUserInfo(userId: string) {
     return await this.userModel.userInfoByUserId(userId);
   }
+
+  async updateUserDisplayName(userId: string, displayName: string) {
+    await this.userModel.updateUserDisplayName(userId, displayName);
+  }
 }
 
 export default UserService;

@@ -59,6 +59,22 @@ class UserModel {
       return result[0];
     });
   }
+
+  async updateUserDisplayName(userId: string, displayName: string) {
+    await db.excuteQuery(async (connection) => {
+      await connection.query(
+        `
+          UPDATE user
+          SET display_name = ?
+          WHERE id = ?
+        `,
+        [displayName, userId],
+      );
+    });
+  }
+  
+  
+  
 }
 
 export default UserModel;

@@ -9,7 +9,7 @@ import {
   SignUpDto,
   CheckDuplicatedEmailDto,
   LoginDto,
-  //UserDisplayNameDto
+  UserDisplayNameDto
 } from '@/dto/user-dto';
 
 @Injectable()
@@ -60,11 +60,13 @@ class UserController {
     return await this.service.getUserInfo(userId);
   }
 
-  //@Put('/user/display-name', auth(UserType.user))
-  //async updateUserDisplayName(@Body() dto: UserDisplayNameDto) {
-  //  const { displayName } = dto;
-  //  console.log('displayName', displayName);
-  //}
+  @Put('/user/display-name', auth(UserType.user))
+  async updateUserDisplayName(
+    @Param('userId') userId: string,
+    @Body() dto: UserDisplayNameDto
+  ) {
+    await this.service.updateUserDisplayName(userId, dto.displayName);
+  }
 }
 
 export default UserController;
