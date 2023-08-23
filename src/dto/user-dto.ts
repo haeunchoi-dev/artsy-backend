@@ -98,3 +98,33 @@ export class UserDisplayNameDto extends BaseDto {
     }
   }
 }
+
+export class UserPasswordDto extends BaseDto {
+  // TODO
+  @Expose()
+  @IsNotEmpty()
+  @IsString()
+  //@IsNotIn(values: any[])
+  //@NotContains(seed: string)
+  //@Matches(pattern: RegExp, modifiers?: string)
+  //@Length(4, 30)
+  currentPassword: string;
+
+  // TODO
+  @Expose()
+  @IsNotEmpty()
+  @IsString()
+  //@IsNotIn(values: any[])
+  //@NotContains(seed: string)
+  //@Matches(pattern: RegExp, modifiers?: string)
+  //@Length(4, 30)
+  newPassword: string;
+
+  async validate(): Promise<void> {
+    try {
+      await validateOrReject(this, { forbidUnknownValues: true });
+    } catch (error) {
+      throw new BadRequestError(ERROR_NAMES.INVALID_PARAM, error);
+    }
+  }
+}

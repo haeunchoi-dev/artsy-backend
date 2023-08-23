@@ -25,6 +25,26 @@ class UserModel {
     });
   }
 
+  async findByUserId(userId: string) {
+    return await db.excuteQuery(async (connection) => {
+      const result = await connection.query(
+        `
+          SELECT
+            id,
+            display_name as displayName,
+            email,
+            password,
+            create_date as createdDate
+          FROM user
+          WHERE id = ?
+        `,
+        [userId],
+      );
+
+      return result;
+    });
+  }
+
   async create(displayName: string, email: string, password: string) {
     return await db.excuteQuery(async (connection) => {
       const result = await connection.query(
@@ -72,9 +92,19 @@ class UserModel {
       );
     });
   }
-  
-  
-  
+
+  async updateUserPassword(userId: string, password: string) {
+    await db.excuteQuery(async (connection) => {
+      await connection.query(
+        `
+          UPDATE user
+          SET password = ?
+          WHERE id = ?
+        `,
+        [password, userId],
+      );
+    });
+  }
 }
 
 export default UserModel;

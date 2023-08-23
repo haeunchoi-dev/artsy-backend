@@ -9,7 +9,8 @@ import {
   SignUpDto,
   CheckDuplicatedEmailDto,
   LoginDto,
-  UserDisplayNameDto
+  UserDisplayNameDto,
+  UserPasswordDto
 } from '@/dto/user-dto';
 
 @Injectable()
@@ -66,6 +67,15 @@ class UserController {
     @Body() dto: UserDisplayNameDto
   ) {
     await this.service.updateUserDisplayName(userId, dto.displayName);
+  }
+
+  @Put('/user/password', auth(UserType.user))
+  async updateUserPassword(
+    @Param('userId') userId: string,
+    @Body() dto: UserPasswordDto
+  ) {
+    const { currentPassword, newPassword } = dto;
+    await this.service.updateUserPassword(userId, currentPassword, newPassword);
   }
 }
 

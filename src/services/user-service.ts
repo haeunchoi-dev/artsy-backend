@@ -84,6 +84,29 @@ class UserService {
   async updateUserDisplayName(userId: string, displayName: string) {
     await this.userModel.updateUserDisplayName(userId, displayName);
   }
+
+  async updateUserPassword(userId: string, currentPassword: string, newPassword: string) {
+    const users = await this.userModel.findByUserId(userId);
+
+    if (users.length === 0) {
+      throw new InternalServerError(
+        ERROR_NAMES.INTERNAL_SERVER_ERROR,
+        'updateUserPassword - users.length === 0',
+      );
+    }
+
+    const user = users[0];
+    const isCorrectPassword = await bcrypt.compare(currentPassword, user.password);
+    if (!isCorrectPassword) {
+      throw new BadRequestError(
+        ERROR_NAMES.INCORRECT_PASSWORD,
+        'updateUserPassword - incorrect password',
+      );
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await this.userModel.updateUserPassword(userId, hashedPassword);
+  }
 }
 
 export default UserService;
