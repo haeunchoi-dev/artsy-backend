@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
 
 import { Injectable } from '@/decorators/di-decorator';
 import {
@@ -7,6 +6,12 @@ import {
   BadRequestError,
   InternalServerError,
 } from '@/error/errors';
+import {
+  hashPassword,
+  comparePassword,
+  generateTempPassword
+} from '@/libs/password';
+import mailSender from '@/libs/mailSender';
 
 import UserModel from '@/models/user-model';
 
@@ -24,7 +29,7 @@ class UserService {
       );
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await hashPassword(password);
     await this.userModel.create(displayName, email, hashedPassword);
   }
 
@@ -47,7 +52,7 @@ class UserService {
     }
 
     const user = users[0];
-    const isCorrectPassword = await bcrypt.compare(password, user.password);
+    const isCorrectPassword = await comparePassword(password, user.password);
     if (!isCorrectPassword) {
       throw new BadRequestError(
         ERROR_NAMES.INCORRECT_PASSWORD,
@@ -79,6 +84,32 @@ class UserService {
 
   async getUserInfo(userId: string) {
     return await this.userModel.userInfoByUserId(userId);
+  }
+
+  async updateUserInfo(userId: string, displayName: string, password?: string) {
+    let _password = password;
+    if (_password) {
+      _password = await hashPassword(_password);
+    }
+    await this.userModel.updateUserInfo(userId, displayName, _password);
+  }
+
+  async findPassword(email: string) {
+    const users = await this.userModel.findByEmail(email);
+
+    if (users.length === 0) {
+      throw new BadRequestError(
+        ERROR_NAMES.NOT_FOUND_EMAIL,
+        'findPassword - users.length === 0',
+      );
+    }
+
+    const tempPassword = generateTempPassword();
+    mailSender.sendTempPassword(email, tempPassword);
+
+    const user = users[0];
+    const hashedPassword = await hashPassword(tempPassword);
+    await this.userModel.updateUserPassword(user.id, hashedPassword);
   }
 }
 

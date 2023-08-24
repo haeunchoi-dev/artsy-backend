@@ -1,5 +1,6 @@
 import { Injectable } from '@/decorators/di-decorator';
 import db from '@/db';
+import QueryBuilder from '@/libs/queryBuilder';
 
 @Injectable()
 class UserModel {
@@ -19,6 +20,26 @@ class UserModel {
           WHERE email = ?
         `,
         [email],
+      );
+
+      return result;
+    });
+  }
+
+  async findByUserId(userId: string) {
+    return await db.excuteQuery(async (connection) => {
+      const result = await connection.query(
+        `
+          SELECT
+            id,
+            display_name as displayName,
+            email,
+            password,
+            create_date as createdDate
+          FROM user
+          WHERE id = ?
+        `,
+        [userId],
       );
 
       return result;
@@ -57,6 +78,35 @@ class UserModel {
       );
 
       return result[0];
+    });
+  }
+
+  async updateUserInfo(userId: string, displayName: string, password?: string) {
+    await db.excuteQuery(async (connection) => {
+      const queryBuilder = new QueryBuilder();
+      const query = queryBuilder
+                      .addText('UPDATE user ')
+                      .addSetValue('display_name', displayName)
+                      .addSetValue('password', password)
+                      .addText(`WHERE id = '${userId}'`)
+                      .getQuery();
+
+      await connection.query(
+        query
+      );
+    });
+  }
+
+  async updateUserPassword(userId: string, password: string) {
+    await db.excuteQuery(async (connection) => {
+      await connection.query(
+        `
+          UPDATE user
+          SET password = ?
+          WHERE id = ?
+        `,
+        [password, userId],
+      );
     });
   }
 }
