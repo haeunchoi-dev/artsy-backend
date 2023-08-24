@@ -47,5 +47,49 @@ export default {
         },
       },
     },
+    put: {
+      tags: ['User'],
+      summary: '사용자 정보 수정',
+      description: '사용자 정보 수정',
+      requestBody: {
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                displayName: {
+                  type: 'string',
+                  description: 'string',
+                  example: '하하호호',
+                },
+                password: {
+                  type: 'string',
+                  description: 'string | undefined',
+                  example: '1234',
+                },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: '사용자 정보 수정',
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  success: {
+                    type: 'boolean',
+                    example: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   },
 };
