@@ -1,5 +1,6 @@
 import { Injectable } from '@/decorators/di-decorator';
 import db from '@/db';
+import QueryBuilder from '@/libs/queryBuilder';
 
 @Injectable()
 class UserModel {
@@ -80,15 +81,18 @@ class UserModel {
     });
   }
 
-  async updateUserDisplayName(userId: string, displayName: string) {
+  async updateUserInfo(userId: string, displayName: string, password?: string) {
     await db.excuteQuery(async (connection) => {
+      const queryBuilder = new QueryBuilder();
+      const query = queryBuilder
+                      .addText('UPDATE user ')
+                      .addSetValue('display_name', displayName)
+                      .addSetValue('password', password)
+                      .addText(`WHERE id = '${userId}'`)
+                      .getQuery();
+
       await connection.query(
-        `
-          UPDATE user
-          SET display_name = ?
-          WHERE id = ?
-        `,
-        [displayName, userId],
+        query
       );
     });
   }

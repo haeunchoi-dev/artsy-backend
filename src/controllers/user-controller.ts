@@ -7,10 +7,9 @@ import { Body, Query, Param } from '@/decorators/req-binding-decorator';
 import UserService from '@/services/user-service';
 import {
   SignUpDto,
-  CheckDuplicatedEmailDto,
+  UserEmailDto,
   LoginDto,
-  UserDisplayNameDto,
-  UserPasswordDto
+  UpdateUserInfoDto,
 } from '@/dto/user-dto';
 
 @Injectable()
@@ -24,7 +23,7 @@ class UserController {
   }
 
   @Post('/user/check-duplicated-email')
-  async checkDuplicatedEmail(@Body() dto: CheckDuplicatedEmailDto) {
+  async checkDuplicatedEmail(@Body() dto: UserEmailDto) {
     const { email } = dto;
     return await this.service.checkDuplicatedEmail(email);
   }
@@ -61,21 +60,21 @@ class UserController {
     return await this.service.getUserInfo(userId);
   }
 
-  @Put('/user/display-name', auth(UserType.user))
+  @Put('/user/info', auth(UserType.user))
   async updateUserDisplayName(
     @Param('userId') userId: string,
-    @Body() dto: UserDisplayNameDto
+    @Body() dto: UpdateUserInfoDto
   ) {
-    await this.service.updateUserDisplayName(userId, dto.displayName);
+    const { displayName, password } = dto;
+    await this.service.updateUserInfo(userId, displayName, password);
   }
 
-  @Put('/user/password', auth(UserType.user))
-  async updateUserPassword(
-    @Param('userId') userId: string,
-    @Body() dto: UserPasswordDto
-  ) {
-    const { currentPassword, newPassword } = dto;
-    await this.service.updateUserPassword(userId, currentPassword, newPassword);
+  @Post('/user/find-password')
+  async findPassword(@Body() dto: UserEmailDto) {
+
+    // TODO
+    // 임시 테이블 생성
+    await this.service.findPassword(dto.email);
   }
 }
 

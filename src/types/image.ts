@@ -15,5 +15,5 @@ export interface IResDBImageFile {
   extension: string;
   fileSize: number;
   isPrimary: number;
-  createDate: null; // TODO check
+  createDate: any; // TODO check
 }
