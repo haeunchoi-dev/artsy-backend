@@ -1,7 +1,6 @@
 import { Expose, Transform } from 'class-transformer';
-import { validateOrReject, Max, MaxLength, IsNotEmpty } from 'class-validator';
+import { Max, MaxLength, IsNotEmpty } from 'class-validator';
 import BaseDto from './base-dto';
-import { BadRequestError, ERROR_NAMES } from '@/error/errors';
 
 export default class TicketDto extends BaseDto {
   @IsNotEmpty()
@@ -40,12 +39,4 @@ export default class TicketDto extends BaseDto {
   })
   @Expose()
   removeFileId: number;
-
-  async validate(): Promise<void> {
-    try {
-      await validateOrReject(this);
-    } catch (error) {
-      throw new BadRequestError(ERROR_NAMES.INVALID_PARAM, error);
-    }
-  }
 }
