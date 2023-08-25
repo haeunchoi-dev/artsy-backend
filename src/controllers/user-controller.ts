@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { setAccessTokenCookie, setRefreshTokenCookie } from '@/libs/api';
 import auth, { UserType } from '@/middlewares/auth';
 import { Injectable } from '@/decorators/di-decorator';
 import { Get, Post, Delete, Put } from '@/decorators/route-decorator';
@@ -15,23 +16,6 @@ import TempLoginDto from '@/dto/temp-login-dto';
 @Injectable()
 class UserController {
   constructor(private readonly service: UserService) {}
-
-  private getLoginTokenInfo(token: string) {
-    const secure = process.env.COOKIE_SECURE === 'true';
-    const sameSite = (process.env.COOKIE_SAMESITE as 'none') || 'lax';
-    const httpOnly = process.env.COOKIE_HTTPONLY === 'true';
-
-    return {
-      key: 'loginToken',
-      token: token,
-      options: {
-        expires: new Date(Date.now() + 3600000),
-        httpOnly,
-        secure,
-        sameSite,
-      }
-    }
-  }
 
   @Post('/user/sign-up')
   async signUp(@Body() dto: SignupDto) {
@@ -51,12 +35,8 @@ class UserController {
 
     const result = await this.service.loginWithEmail(email, password);
 
-    const cookieInfo = this.getLoginTokenInfo(result.token);
-    res.cookie(
-      cookieInfo.key,
-      cookieInfo.token,
-      cookieInfo.options
-    );
+    setAccessTokenCookie(res, result.accessToken);
+    setRefreshTokenCookie(res, result.refreshToken);
 
     return {
       ...result.userInfo,
@@ -65,7 +45,8 @@ class UserController {
 
   @Post('/user/logout', auth(UserType.user))
   async logout(_: Request, res: Response) {
-    res.clearCookie('loginToken');
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
   }
 
   @Get('/user/info', auth(UserType.user))
@@ -93,12 +74,8 @@ class UserController {
 
     const result = await this.service.tempLogin(email, password);
 
-    const cookieInfo = this.getLoginTokenInfo(result.token);
-    res.cookie(
-      cookieInfo.key,
-      cookieInfo.token,
-      cookieInfo.options
-    );
+    setAccessTokenCookie(res, result.accessToken);
+    setRefreshTokenCookie(res, result.refreshToken);
 
     return {
       ...result.userInfo,

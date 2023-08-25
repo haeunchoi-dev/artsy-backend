@@ -1,11 +1,10 @@
-import jwt from 'jsonwebtoken';
-
 import { Injectable } from '@/decorators/di-decorator';
 import {
   ERROR_NAMES,
   BadRequestError,
   InternalServerError,
 } from '@/error/errors';
+import jwt from '@/libs/jwt';
 import {
   hashPassword,
   comparePassword,
@@ -13,18 +12,20 @@ import {
 } from '@/libs/password';
 import mailSender from '@/libs/mailSender';
 
+
+
 import { IResDBUser } from '@/types/user';
 import UserModel from '@/models/user-model';
 import UserTempPasswordModel from '@/models/user-temp-password-model';
 
 @Injectable()
 class UserService {
+  private jwtSecretKey: string;
+
   constructor(
     private readonly userModel: UserModel,
     private readonly userTempPasswordModel: UserTempPasswordModel,
-  ) {}
-
-  private getTokenAndUserInfo(user: IResDBUser) {
+  ) {
     const secretKey = process.env.TOKEN_SECRET_KEY;
     if (!secretKey) {
       throw new InternalServerError(
@@ -32,18 +33,13 @@ class UserService {
         'loginWithEmail - secretKey === undefined',
       );
     }
+    this.jwtSecretKey = secretKey;
+  }
 
-    // TODO Access Token and Refresh Token
-    const token = jwt.sign({ userId: user.id }, secretKey);
-
-    return {
-      token: token,
-      userInfo: {
-        displayName: user.displayName,
-        email: user.email,
-        createdDate: user.createdDate,
-      }
-    };
+  private async getAccessTokenAndRefreshToken(userId: string) {
+    const accessToken = jwt.getSignedAccessToken(userId);
+    const refreshToken = await jwt.getSignedRefreshToken(userId);
+    return { accessToken, refreshToken }
   }
 
   async signUpWithEmail(displayName: string, email: string, password: string) {
@@ -87,8 +83,16 @@ class UserService {
       );
     }
 
-    const resUserInfo = this.getTokenAndUserInfo(user);
-    return resUserInfo;
+    const { accessToken, refreshToken } = await this.getAccessTokenAndRefreshToken(user.id);
+    return {
+      accessToken,
+      refreshToken,
+      userInfo: {
+        displayName: user.displayName,
+        email: user.email,
+        createdDate: user.createdDate,
+      }
+    };
   }
 
   async getUserInfo(userId: string) {
@@ -146,7 +150,16 @@ class UserService {
     await this.userTempPasswordModel.deleteByEmail(email)
 
     const realUser = (await this.userModel.findByEmail(email))[0];
-    return this.getTokenAndUserInfo(realUser);
+    const { accessToken, refreshToken } = await this.getAccessTokenAndRefreshToken(realUser.id);
+    return {
+      accessToken,
+      refreshToken,
+      userInfo: {
+        displayName: realUser.displayName,
+        email: realUser.email,
+        createdDate: realUser.createdDate,
+      }
+    };
   }
 }
 
