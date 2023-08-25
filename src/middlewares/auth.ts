@@ -1,8 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
-
-import { ERROR_NAMES, UnauthorizedError, InternalServerError } from '@/error/errors';
+import {
+  ERROR_NAMES,
+  UnauthorizedError,
+  InternalServerError,
+} from '@/error/errors';
 import jwt from '@/libs/jwt';
 import { setAccessTokenCookie } from '@/libs/api';
+import UserDto from '@/dto/user-dto';
 
 export enum UserType {
   user = 'user',
@@ -21,7 +25,10 @@ export default function auth(userType: UserType) {
       //  break;
       //}
       default: {
-        throw new InternalServerError(ERROR_NAMES.INTERNAL_SERVER_ERROR, 'auth error - undefined user type');
+        throw new InternalServerError(
+          ERROR_NAMES.INTERNAL_SERVER_ERROR,
+          'auth error - undefined user type',
+        );
       }
     }
   };
@@ -32,10 +39,14 @@ async function authMember(req: Request, res: Response, next: NextFunction) {
 
   try {
     if (!accessToken || !refreshToken) {
-      throw new UnauthorizedError(ERROR_NAMES.UNAUTHORIZED, 'authMember - invalid tokens');
+      throw new UnauthorizedError(
+        ERROR_NAMES.UNAUTHORIZED,
+        'authMember - invalid tokens',
+      );
     }
 
-    const { newAccessToken, userId } = await jwt.verifyAccessTokenAndRefreshToken(accessToken, refreshToken);
+    const { newAccessToken, userId } =
+      await jwt.verifyAccessTokenAndRefreshToken(accessToken, refreshToken);
 
     if (newAccessToken !== undefined) {
       //console.log('새로운 access token이 존재하여 쿠키에 세팅');
@@ -43,8 +54,8 @@ async function authMember(req: Request, res: Response, next: NextFunction) {
     }
 
     req.params.userId = userId;
+    req.user = new UserDto(userId);
     next();
-
   } catch (error) {
     next(error);
   }

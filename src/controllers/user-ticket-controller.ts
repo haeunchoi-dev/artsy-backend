@@ -6,6 +6,7 @@ import auth, { UserType } from '@/middlewares/auth';
 import { tempImageUpload } from '@/middlewares/multer';
 import UserTicketService from '@/services/user-ticket-service';
 import TicketDto from '@/dto/ticket-dto';
+import UserDto from '@/dto/user-dto';
 
 @Injectable()
 class UserTicketController {
@@ -29,11 +30,11 @@ class UserTicketController {
 
   @Post('/user/ticket', auth(UserType.user), tempImageUpload.array('file'))
   async setTicket(
-    @Param('userId') userId: string,
-    @Body() ticketDto: TicketDto,
+    @Req('user') user: UserDto,
     @Req('files', []) files: Express.Multer.File[],
+    @Body() ticketDto: TicketDto,
   ) {
-    return await this.service.setTicket(userId, files, ticketDto);
+    return await this.service.setTicket(user, files, ticketDto);
   }
 
   @Get('/user/ticket/:ticketId', auth(UserType.user))

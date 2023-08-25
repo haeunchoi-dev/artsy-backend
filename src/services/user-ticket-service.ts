@@ -6,6 +6,8 @@ import { IResDBImageFile, IS3ImageFile } from '@/types/image';
 import fileManager from '@/libs/fileManager';
 import TicketDto from '@/dto/ticket-dto';
 
+import UserDto from '@/dto/user-dto';
+
 @Injectable()
 class UserTicketService {
   constructor(private readonly model: TicketModel) {}
@@ -20,7 +22,7 @@ class UserTicketService {
   }
 
   async setTicket(
-    userId: string,
+    { userId }: UserDto,
     files: Express.Multer.File[],
     { categoryId, title, showDate, place, price, rating, review }: TicketDto,
   ) {
