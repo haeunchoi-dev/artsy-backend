@@ -13,7 +13,7 @@ class UserTicketService {
   constructor(private readonly model: TicketModel) {}
 
   async getTicketList(
-    userId: string,
+    { userId }: UserDto,
     categoryId: number | null,
     limit: number,
     lastId: number | null,
@@ -42,7 +42,7 @@ class UserTicketService {
     return result;
   }
 
-  async getTicket(userId: string, ticketId: number) {
+  async getTicket({ userId }: UserDto, ticketId: number) {
     const ticket = await this.model.findUserIdById(ticketId);
 
     if (ticket.length === 0) {
@@ -60,16 +60,16 @@ class UserTicketService {
     return result;
   }
 
-  async getTicketTotalCount(userId: string) {
+  async getTicketTotalCount({ userId }: UserDto) {
     return await this.model.totalCountByUserId(userId);
   }
 
-  async getTicketTotalPrice(userId: string) {
+  async getTicketTotalPrice({ userId }: UserDto) {
     return await this.model.totalPriceByUserId(userId);
   }
 
   async updateTicket(
-    userId: string,
+    { userId }: UserDto,
     ticketId: number,
     files: Express.Multer.File[],
     {
@@ -120,7 +120,7 @@ class UserTicketService {
     return result;
   }
 
-  async deleteTicket(userId: string, ticketId: number) {
+  async deleteTicket({ userId }: UserDto, ticketId: number) {
     const ticket = await this.model.findUserIdById(ticketId);
 
     if (ticket.length === 0) {
