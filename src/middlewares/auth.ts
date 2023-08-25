@@ -46,11 +46,7 @@ function authMember(req: Request, next: NextFunction) {
   }
 
   try {
-    // TODO type
-    const userInfo = jwt.verify(
-      loginToken,
-      process.env.TOKEN_SECRET_KEY || 'artsy-secret-key',
-    ) as { userId: string };
+    const userInfo = jwt.verify(loginToken, process.env.TOKEN_SECRET_KEY || 'artsy-secret-key') as { userId: string };
     req.params.userId = userInfo.userId;
     next();
 

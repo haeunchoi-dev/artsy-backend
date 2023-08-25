@@ -16,6 +16,23 @@ import {
 class UserController {
   constructor(private readonly service: UserService) {}
 
+  private getLoginTokenInfo(token: string) {
+    const secure = process.env.COOKIE_SECURE === 'true';
+    const sameSite = (process.env.COOKIE_SAMESITE as 'none') || 'lax';
+    const httpOnly = process.env.COOKIE_HTTPONLY === 'true';
+
+    return {
+      key: 'loginToken',
+      token: token,
+      options: {
+        expires: new Date(Date.now() + 3600000),
+        httpOnly,
+        secure,
+        sameSite,
+      }
+    }
+  }
+
   @Post('/user/sign-up')
   async signUp(@Body() dto: SignUpDto) {
     const { displayName, email, password } = dto;
@@ -34,16 +51,12 @@ class UserController {
 
     const result = await this.service.loginWithEmail(email, password);
 
-    const secure = process.env.COOKIE_SECURE === 'true';
-    const sameSite = (process.env.COOKIE_SAMESITE as 'none') || 'lax';
-    const httpOnly = process.env.COOKIE_HTTPONLY === 'true';
-
-    res.cookie('loginToken', result.token, {
-      expires: new Date(Date.now() + 3600000),
-      httpOnly,
-      secure,
-      sameSite,
-    });
+    const cookieInfo = this.getLoginTokenInfo(result.token);
+    res.cookie(
+      cookieInfo.key,
+      cookieInfo.token,
+      cookieInfo.options
+    );
 
     return {
       ...result.userInfo,
@@ -70,11 +83,26 @@ class UserController {
   }
 
   @Post('/user/find-password')
-  async findPassword(@Body() dto: UserEmailDto) {
+  async requestTempPassword(@Body() dto: UserEmailDto) {
+    await this.service.requestTempPassword(dto.email);
+  }
 
-    // TODO
-    // 임시 테이블 생성
-    await this.service.findPassword(dto.email);
+  @Post('/user/temp-login')
+  async tempLogin(@Body() dto: LoginDto, res: Response) {
+    const { email, password } = dto;
+    
+    const result = await this.service.tempLogin(email, password);
+
+    const cookieInfo = this.getLoginTokenInfo(result.token);
+    res.cookie(
+      cookieInfo.key,
+      cookieInfo.token,
+      cookieInfo.options
+    );
+
+    return {
+      ...result.userInfo,
+    };
   }
 }
 

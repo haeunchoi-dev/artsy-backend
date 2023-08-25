@@ -27,9 +27,7 @@ class MailSender {
   private send(toEmail: string, subject: string, text: string) {
     const mailOptions = {
       from: this.fromEmail,
-      // TODO
-      //to: toEmail,
-      to: 'qpow1018@gmail.com',
+      to: toEmail,
       subject: subject,
       text: text
     };
@@ -39,7 +37,7 @@ class MailSender {
 
   public sendTempPassword(toEmail: string, password: string) {
     const subject = 'Artsy 임시 비밀번호입니다.';
-    const text = `임시 비밀번호는 ${password} 입니다. 로그인 후 비밀번호를 변경해주세요.`;
+    const text = `1회용 임시 비밀번호는 ${password} 입니다. 로그인 후 비밀번호를 반드시 변경해주세요.`;
     this.send(toEmail, subject, text);
   }
 }

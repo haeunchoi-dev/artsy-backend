@@ -13,11 +13,38 @@ import {
 } from '@/libs/password';
 import mailSender from '@/libs/mailSender';
 
+import { IResDBUser } from '@/types/user';
 import UserModel from '@/models/user-model';
+import UserTempPasswordModel from '@/models/user-temp-password-model';
 
 @Injectable()
 class UserService {
-  constructor(private readonly userModel: UserModel) {}
+  constructor(
+    private readonly userModel: UserModel,
+    private readonly userTempPasswordModel: UserTempPasswordModel,
+  ) {}
+
+  private getTokenAndUserInfo(user: IResDBUser) {
+    const secretKey = process.env.TOKEN_SECRET_KEY;
+    if (!secretKey) {
+      throw new InternalServerError(
+        ERROR_NAMES.INTERNAL_SERVER_ERROR,
+        'loginWithEmail - secretKey === undefined',
+      );
+    }
+
+    // TODO Access Token and Refresh Token
+    const token = jwt.sign({ userId: user.id }, secretKey);
+
+    return {
+      token: token,
+      userInfo: {
+        displayName: user.displayName,
+        email: user.email,
+        createdDate: user.createdDate,
+      }
+    };
+  }
 
   async signUpWithEmail(displayName: string, email: string, password: string) {
     const users = await this.userModel.findByEmail(email);
@@ -60,26 +87,8 @@ class UserService {
       );
     }
 
-    const secretKey = process.env.TOKEN_SECRET_KEY;
-    if (!secretKey) {
-      throw new InternalServerError(
-        ERROR_NAMES.INTERNAL_SERVER_ERROR,
-        'loginWithEmail - secretKey === undefined',
-      );
-    }
-
-    // TODO Access Token and Refresh Token
-    const token = jwt.sign({ userId: user.id }, secretKey);
-
-    // TODO createdDate to timestamp
-    return {
-      token: token,
-      userInfo: {
-        displayName: user.displayName,
-        email: user.email,
-        createdDate: user.createdDate,
-      },
-    };
+    const resUserInfo = this.getTokenAndUserInfo(user);
+    return resUserInfo;
   }
 
   async getUserInfo(userId: string) {
@@ -94,7 +103,7 @@ class UserService {
     await this.userModel.updateUserInfo(userId, displayName, _password);
   }
 
-  async findPassword(email: string) {
+  async requestTempPassword(email: string) {
     const users = await this.userModel.findByEmail(email);
 
     if (users.length === 0) {
@@ -107,9 +116,37 @@ class UserService {
     const tempPassword = generateTempPassword();
     mailSender.sendTempPassword(email, tempPassword);
 
-    const user = users[0];
     const hashedPassword = await hashPassword(tempPassword);
-    await this.userModel.updateUserPassword(user.id, hashedPassword);
+    await this.userTempPasswordModel.create(email, hashedPassword);
+  }
+
+  async tempLogin(email: string, password: string) {
+    const users = await this.userTempPasswordModel.findByEmailAndLimitDate(email, 10);
+
+    if (users.length === 0) {
+      throw new BadRequestError(
+        ERROR_NAMES.DATA_NOT_FOUND,
+        'tempLogin - users.length === 0',
+      );
+    }
+
+    const promiseList = users.map(async (user: IResDBUser) => {
+      const isCorrectPassword = await comparePassword(password, user.password);
+      return isCorrectPassword;
+    });
+
+    const results = await Promise.all(promiseList);
+    if (results.every(result => result === false)) {
+      throw new BadRequestError(
+        ERROR_NAMES.INCORRECT_PASSWORD,
+        'tempLogin - incorrect password',
+      );
+    }
+
+    await this.userTempPasswordModel.deleteByEmail(email)
+
+    const realUser = (await this.userModel.findByEmail(email))[0];
+    return this.getTokenAndUserInfo(realUser);
   }
 }
 
