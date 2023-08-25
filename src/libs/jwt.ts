@@ -29,14 +29,24 @@ class JWT {
       throw new Error('undefined redis info');
     }
 
+    //const redisClient = redis.createClient({
+    //  password: redisPassword,
+    //  socket: {
+    //      host: redisHost,
+    //      port: Number(redisPort)
+    //  },
+    //  legacyMode: true
+    //});
+
     const redisClient = redis.createClient({
       password: redisPassword,
       socket: {
-          host: redisHost,
-          port: Number(redisPort)
+        host: redisHost,
+        port: Number(redisPort)
       },
       legacyMode: true
     });
+
 
     redisClient.on('connect', () => {
       console.info('Redis connected!');
