@@ -5,12 +5,12 @@ import { Get, Post, Delete, Put } from '@/decorators/route-decorator';
 import { Body, Query, Param } from '@/decorators/req-binding-decorator';
 
 import UserService from '@/services/user-service';
-import {
-  SignUpDto,
-  UserEmailDto,
-  LoginDto,
-  UpdateUserInfoDto,
-} from '@/dto/user-dto';
+import SignupDto from '@/dto/signup-dto';
+import CheckDuplicatedEmailDto from '@/dto/check-duplicated-email-dto';
+import LoginDto from '@/dto/login-dto';
+import UpdateUserInfoDto from '@/dto/update-user-info-dto';
+import PostTempPasswordDto from '@/dto/post-temp-password-dto';
+import TempLoginDto from '@/dto/temp-login-dto';
 
 @Injectable()
 class UserController {
@@ -34,13 +34,13 @@ class UserController {
   }
 
   @Post('/user/sign-up')
-  async signUp(@Body() dto: SignUpDto) {
+  async signUp(@Body() dto: SignupDto) {
     const { displayName, email, password } = dto;
     await this.service.signUpWithEmail(displayName, email, password);
   }
 
   @Post('/user/check-duplicated-email')
-  async checkDuplicatedEmail(@Body() dto: UserEmailDto) {
+  async checkDuplicatedEmail(@Body() dto: CheckDuplicatedEmailDto) {
     const { email } = dto;
     return await this.service.checkDuplicatedEmail(email);
   }
@@ -83,14 +83,14 @@ class UserController {
   }
 
   @Post('/user/find-password')
-  async requestTempPassword(@Body() dto: UserEmailDto) {
+  async requestTempPassword(@Body() dto: PostTempPasswordDto) {
     await this.service.requestTempPassword(dto.email);
   }
 
   @Post('/user/temp-login')
-  async tempLogin(@Body() dto: LoginDto, res: Response) {
+  async tempLogin(@Body() dto: TempLoginDto, res: Response) {
     const { email, password } = dto;
-    
+
     const result = await this.service.tempLogin(email, password);
 
     const cookieInfo = this.getLoginTokenInfo(result.token);

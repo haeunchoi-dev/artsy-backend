@@ -2,17 +2,7 @@ import { Expose, Transform, TransformFnParams } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import BaseDto from './base-dto';
 
-export default class SignupDto extends BaseDto {
-  // TODO
-  @Expose()
-  @IsNotEmpty()
-  @IsString()
-  //@Length(2, 30)
-  @Transform(({ value }: TransformFnParams) => {
-    if (typeof(value) === 'string') return value.trim();
-  })
-  displayName: string;
-
+export default class LoginDto extends BaseDto {
   @Expose()
   @IsNotEmpty()
   @IsEmail()
