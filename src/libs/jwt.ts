@@ -21,23 +21,28 @@ class JWT {
     }
     this.secretKey = secretKey;
 
-    const redisUserName = process.env.REDIS_USERNAME;
-    const redisPassword = process.env.REDIS_PASSWORD;
     const redisHost = process.env.REDIS_HOST;
-    if (!redisUserName || !redisPassword || !redisHost) {
+    const redisPort = process.env.REDIS_PORT;
+    const redisPassword = process.env.REDIS_PASSWORD;
+
+    if (!redisHost || !redisPort || !redisPassword) {
       throw new Error('undefined redis info');
     }
 
     const redisClient = redis.createClient({
-      url: `redis://${redisUserName}:${redisPassword}@${redisHost}/0`,
+      password: redisPassword,
+      socket: {
+          host: redisHost,
+          port: Number(redisPort)
+      },
       legacyMode: true
     });
 
     redisClient.on('connect', () => {
-      //console.info('Redis connected!');
+      console.info('Redis connected!');
     });
     redisClient.on('error', (err) => {
-      //console.error('Redis Client Error', err);
+      console.error('Redis Client Error', err);
       throw new Error(err);
     });
     redisClient.connect().then();
