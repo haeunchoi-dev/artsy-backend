@@ -4,7 +4,7 @@ import {
   UnauthorizedError,
   InternalServerError,
 } from '@/error/errors';
-import jwt from '@/libs/jwt';
+import JWT from '@/libs/jwt';
 import { setAccessTokenCookie } from '@/libs/api';
 import UserDto from '@/dto/user-dto';
 
@@ -46,13 +46,14 @@ async function authMember(req: Request, res: Response, next: NextFunction) {
     }
 
     const { newAccessToken, userId } =
-      await jwt.verifyAccessTokenAndRefreshToken(accessToken, refreshToken);
+      await JWT.getInstance().verifyAccessTokenAndRefreshToken(accessToken, refreshToken);
 
     if (newAccessToken !== undefined) {
       //console.log('새로운 access token이 존재하여 쿠키에 세팅');
       setAccessTokenCookie(res, newAccessToken);
     }
 
+    // TODO
     req.params.userId = userId;
     req.user = new UserDto(userId);
     next();

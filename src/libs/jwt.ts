@@ -10,9 +10,41 @@ interface IAccessTokenPayload {
   userId: string;
 }
 
+initRedis();
+
+async function initRedis() {
+  const redisHost = process.env.REDIS_HOST;
+  const redisPort = process.env.REDIS_PORT;
+  const redisPassword = process.env.REDIS_PASSWORD;
+
+  if (!redisHost || !redisPort || !redisPassword) {
+    throw new Error('undefined redis info');
+  }
+
+  const redisClient = redis.createClient({
+    password: redisPassword,
+    socket: {
+      host: redisHost,
+      port: Number(redisPort),
+    },
+    legacyMode: true,
+  });
+
+  try {
+    await redisClient.connect();
+    const jwt = JWT.getInstance();
+    jwt.addRedisCli(redisClient.v4);
+
+  } catch (error) {
+    console.error('Failed to connect to Redis', error);
+    throw new Error(error);
+  }
+}
+
 class JWT {
+  private static instance: JWT | null = null;
+  private redisCli: Record<string, any> | null;
   private secretKey: string;
-  private redisCli: Record<string, any>
 
   constructor() {
     const secretKey = process.env.TOKEN_SECRET_KEY;
@@ -20,43 +52,17 @@ class JWT {
       throw new Error('undefined secretKey');
     }
     this.secretKey = secretKey;
+  }
 
-    const redisHost = process.env.REDIS_HOST;
-    const redisPort = process.env.REDIS_PORT;
-    const redisPassword = process.env.REDIS_PASSWORD;
-
-    if (!redisHost || !redisPort || !redisPassword) {
-      throw new Error('undefined redis info');
+  public static getInstance(): JWT {
+    if (!JWT.instance) {
+      JWT.instance = new JWT();
     }
+    return JWT.instance;
+  }
 
-    //const redisClient = redis.createClient({
-    //  password: redisPassword,
-    //  socket: {
-    //      host: redisHost,
-    //      port: Number(redisPort)
-    //  },
-    //  legacyMode: true
-    //});
-
-    const redisClient = redis.createClient({
-      password: redisPassword,
-      socket: {
-        host: redisHost,
-        port: Number(redisPort)
-      },
-      legacyMode: true
-    });
-
-
-    redisClient.on('connect', () => {
-      console.info('Redis connected!');
-    });
-    redisClient.on('error', (err) => {
-      console.error('Redis Client Error', err);
-      throw new Error(err);
-    });
-    redisClient.connect().then();
-    this.redisCli = redisClient.v4;
+  public addRedisCli(redisCli: Record<string, any>) {
+    this.redisCli = redisCli;
   }
 
   public getSignedAccessToken(userId: String) {
@@ -64,20 +70,23 @@ class JWT {
   }
 
   public async getSignedRefreshToken(userId: String) {
+    this._checkRedisCli();
+
     const refreshToken = jwt.sign({}, this.secretKey, { expiresIn: '14d' });
 
-    const isExists = await this.redisCli.exists(userId);
+    const isExists = await this.redisCli!.exists(userId);
     if (isExists === 1) {
-      //console.log('기존 redis 데이터 삭제');
-      await this.redisCli.del(userId);
+      await this.redisCli!.del(userId);
     }
 
-    await this.redisCli.set(userId, refreshToken);
+    await this.redisCli!.set(userId, refreshToken);
 
     return refreshToken;
   }
 
   public async verifyAccessTokenAndRefreshToken(accessToken: string, refreshToken: string) {
+    this._checkRedisCli();
+
     try {
       const isAccessTokenExpired = this._isTokenExpired(accessToken);
       const userId = this._decodeAccessToken(accessToken);
@@ -98,7 +107,7 @@ class JWT {
 
       // 2. refresh token이 redis에 존재하고 value가 같다면 유효 토큰
       // 유효하지 않은 토큰이라면 401 에러 전달
-      const refreshTokenInRedis = await this.redisCli.get(userId);
+      const refreshTokenInRedis = await this.redisCli!.get(userId);
       if (!(refreshTokenInRedis === refreshToken)) {
         //console.log('refresh token이 이상함 이건 에러');
         throw new UnauthorizedError(ERROR_NAMES.UNAUTHORIZED, 'invalid refresh token');
@@ -135,7 +144,12 @@ class JWT {
     const payload = jwt.decode(accessToken) as IAccessTokenPayload;
     return payload.userId;
   }
+
+  private _checkRedisCli() {
+    if (!this.redisCli) {
+      throw new Error('redis cli is null');
+    }
+  }
 }
 
-const _inst = new JWT();
-export default _inst;
+export default JWT;

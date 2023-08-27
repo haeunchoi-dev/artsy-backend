@@ -4,15 +4,13 @@ import {
   BadRequestError,
   InternalServerError,
 } from '@/error/errors';
-import jwt from '@/libs/jwt';
+import JWT from '@/libs/jwt';
 import {
   hashPassword,
   comparePassword,
   generateTempPassword
 } from '@/libs/password';
 import mailSender from '@/libs/mailSender';
-
-
 
 import { IResDBUser } from '@/types/user';
 import UserModel from '@/models/user-model';
@@ -37,9 +35,9 @@ class UserService {
   }
 
   private async getAccessTokenAndRefreshToken(userId: string) {
-    const accessToken = jwt.getSignedAccessToken(userId);
-    const refreshToken = await jwt.getSignedRefreshToken(userId);
-    return { accessToken, refreshToken }
+    const accessToken = JWT.getInstance().getSignedAccessToken(userId);
+    const refreshToken = await JWT.getInstance().getSignedRefreshToken(userId);
+    return { accessToken, refreshToken };
   }
 
   async signUpWithEmail(displayName: string, email: string, password: string) {
