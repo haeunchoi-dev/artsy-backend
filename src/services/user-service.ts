@@ -15,24 +15,14 @@ import mailSender from '@/libs/mailSender';
 import { IResDBUser } from '@/types/user';
 import UserModel from '@/models/user-model';
 import UserTempPasswordModel from '@/models/user-temp-password-model';
+import UserDto from '@/dto/user-dto';
 
 @Injectable()
 class UserService {
-  private jwtSecretKey: string;
-
   constructor(
     private readonly userModel: UserModel,
     private readonly userTempPasswordModel: UserTempPasswordModel,
-  ) {
-    const secretKey = process.env.TOKEN_SECRET_KEY;
-    if (!secretKey) {
-      throw new InternalServerError(
-        ERROR_NAMES.INTERNAL_SERVER_ERROR,
-        'loginWithEmail - secretKey === undefined',
-      );
-    }
-    this.jwtSecretKey = secretKey;
-  }
+  ) {}
 
   private async getAccessTokenAndRefreshToken(userId: string) {
     const accessToken = JWT.getInstance().getSignedAccessToken(userId);
@@ -93,11 +83,11 @@ class UserService {
     };
   }
 
-  async getUserInfo(userId: string) {
+  async getUserInfo({ userId }: UserDto) {
     return await this.userModel.userInfoByUserId(userId);
   }
 
-  async updateUserInfo(userId: string, displayName: string, password?: string) {
+  async updateUserInfo({ userId }: UserDto, displayName: string, password?: string) {
     let _password = password;
     if (_password) {
       _password = await hashPassword(_password);

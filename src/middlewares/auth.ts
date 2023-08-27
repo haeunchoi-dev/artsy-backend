@@ -53,8 +53,6 @@ async function authMember(req: Request, res: Response, next: NextFunction) {
       setAccessTokenCookie(res, newAccessToken);
     }
 
-    // TODO
-    req.params.userId = userId;
     req.user = new UserDto(userId);
     next();
   } catch (error) {

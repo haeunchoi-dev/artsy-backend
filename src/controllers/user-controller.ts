@@ -3,7 +3,7 @@ import { setAccessTokenCookie, setRefreshTokenCookie } from '@/libs/api';
 import auth, { UserType } from '@/middlewares/auth';
 import { Injectable } from '@/decorators/di-decorator';
 import { Get, Post, Delete, Put } from '@/decorators/route-decorator';
-import { Body, Query, Param } from '@/decorators/req-binding-decorator';
+import { Body, Query, Param, Req } from '@/decorators/req-binding-decorator';
 
 import UserService from '@/services/user-service';
 import SignupDto from '@/dto/signup-dto';
@@ -12,6 +12,7 @@ import LoginDto from '@/dto/login-dto';
 import UpdateUserInfoDto from '@/dto/update-user-info-dto';
 import PostTempPasswordDto from '@/dto/post-temp-password-dto';
 import TempLoginDto from '@/dto/temp-login-dto';
+import UserDto from '@/dto/user-dto';
 
 @Injectable()
 class UserController {
@@ -50,17 +51,17 @@ class UserController {
   }
 
   @Get('/user/info', auth(UserType.user))
-  async getUserInfo(@Param('userId') userId: string) {
-    return await this.service.getUserInfo(userId);
+  async getUserInfo(@Req('user') user: UserDto,) {
+    return await this.service.getUserInfo(user);
   }
 
   @Put('/user/info', auth(UserType.user))
   async updateUserDisplayName(
-    @Param('userId') userId: string,
+    user: UserDto,
     @Body() dto: UpdateUserInfoDto
   ) {
     const { displayName, password } = dto;
-    await this.service.updateUserInfo(userId, displayName, password);
+    await this.service.updateUserInfo(user, displayName, password);
   }
 
   @Post('/user/find-password')
