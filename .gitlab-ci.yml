@@ -12,9 +12,9 @@ variables:
 deploy_to_s3:
   stage: deploy_to_s3
   script:
-    - echo "Debugging environment variables:"
-    - echo "AWS_DEFAULT_REGION: $AWS_DEFAULT_REGION"
-    - echo "S3_BUCKET: $S3_BUCKET"
+    - echo "debugging environment variables"
+    - echo "AWS_ACCESS_KEY_ID $AWS_ACCESS_KEY_ID"
+    - echo "S3_BUCKET $S3_BUCKET"
     - apt-get update -y
     - apt-get install -y zip
     - zip -r my-express-app.zip .
