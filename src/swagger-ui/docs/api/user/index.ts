@@ -5,6 +5,7 @@ import tickets from './tickets';
 import ticket from './ticket';
 import info from './info';
 import logout from './logout';
+import checkPassword from './checkPassword';
 
 export default {
   ...signUp,
@@ -14,4 +15,5 @@ export default {
   ...ticket,
   ...info,
   ...logout,
+  ...checkPassword,
 };
