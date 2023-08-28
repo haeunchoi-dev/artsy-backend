@@ -149,6 +149,20 @@ class UserService {
       }
     };
   }
+
+  async checkPassword(userId: string, password: string) {
+    const users = await this.userModel.findByUserId(userId);
+
+    if (users.length === 0) {
+      throw new BadRequestError(
+        ERROR_NAMES.DATA_NOT_FOUND,
+        'tempLogin - users.length === 0',
+      );
+    }
+
+    const user = users[0];
+    return await comparePassword(password, user.password);
+  }
 }
 
 export default UserService;

@@ -13,6 +13,7 @@ import UpdateUserInfoDto from '@/dto/update-user-info-dto';
 import PostTempPasswordDto from '@/dto/post-temp-password-dto';
 import TempLoginDto from '@/dto/temp-login-dto';
 import UserDto from '@/dto/user-dto';
+import CheckPasswordDto from '@/dto/check-password-dto';
 
 @Injectable()
 class UserController {
@@ -51,7 +52,7 @@ class UserController {
   }
 
   @Get('/user/info', auth(UserType.user))
-  async getUserInfo(@Req('user') user: UserDto,) {
+  async getUserInfo(@Req('user') user: UserDto) {
     return await this.service.getUserInfo(user);
   }
 
@@ -80,6 +81,15 @@ class UserController {
 
     return {
       ...result.userInfo,
+    };
+  }
+
+  @Post('/user/check-password', auth(UserType.user))
+  async checkPassword(@Req('user') user: UserDto, @Body() dto: CheckPasswordDto) {
+    const result = await this.service.checkPassword(user.userId, dto.password);
+
+    return {
+      isCorrect: result
     };
   }
 }
