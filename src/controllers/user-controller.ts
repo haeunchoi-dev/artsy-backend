@@ -58,7 +58,7 @@ class UserController {
 
   @Put('/user/info', auth(UserType.user))
   async updateUserDisplayName(
-    user: UserDto,
+    @Req('user') user: UserDto,
     @Body() dto: UpdateUserInfoDto
   ) {
     const { displayName, password } = dto;

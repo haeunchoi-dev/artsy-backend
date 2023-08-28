@@ -1,15 +1,11 @@
 import { Expose } from 'class-transformer';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, Matches } from 'class-validator';
 import BaseDto from './base-dto';
 
 export default class CheckPasswordDto extends BaseDto {
-  // TODO
   @Expose()
   @IsNotEmpty()
   @IsString()
-  //@IsNotIn(values: any[])
-  //@NotContains(seed: string)
-  //@Matches(pattern: RegExp, modifiers?: string)
-  //@Length(4, 30)
+  @Matches(/^(?=.*[a-zA-Z])(?=.*[!@#$%^&*+=-])(?=.*[0-9])[a-zA-Z0-9!@#$%^&*+=-]{8,15}$/)
   password: string;
 }

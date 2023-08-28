@@ -1,5 +1,5 @@
-import { Expose, Transform, TransformFnParams } from 'class-transformer';
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { Expose } from 'class-transformer';
+import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator';
 import BaseDto from './base-dto';
 
 export default class LoginDto extends BaseDto {
@@ -8,13 +8,9 @@ export default class LoginDto extends BaseDto {
   @IsEmail()
   email: string;
 
-  // TODO
   @Expose()
   @IsNotEmpty()
   @IsString()
-  //@IsNotIn(values: any[])
-  //@NotContains(seed: string)
-  //@Matches(pattern: RegExp, modifiers?: string)
-  //@Length(4, 30)
+  @Matches(/^(?=.*[a-zA-Z])(?=.*[!@#$%^&*+=-])(?=.*[0-9])[a-zA-Z0-9!@#$%^&*+=-]{8,15}$/)
   password: string;
 }
