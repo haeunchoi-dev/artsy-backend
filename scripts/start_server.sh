@@ -3,7 +3,7 @@
 env_source="/home/ubuntu/env"
 build_source="/home/ubuntu/build"
 
-sudo cp $backup_source/.env $build_source/.env
+sudo cp $env_source/.env $build_source/.env
 
 cd $build_source
 
