@@ -343,6 +343,41 @@ class TicketModel {
       return result;
     });
   }
+
+  async statuctucByUserIdAndDate(
+    userId: string,
+    startDate: string,
+    endDate: string,
+  ) {
+    return await db.excuteQuery(async (connection) => {
+      const result = await connection.query(
+        `
+        SELECT 
+          count(id) as cntPerMonth,
+          sum(price) as pricePerMonth
+        FROM ticket
+        WHERE user_id = ?
+          AND show_date >= ? 
+          AND show_date < ?
+        `,
+        [userId, startDate, endDate],
+      );
+      return result[0];
+    });
+  }
+
+  async percentageByUserId(userId: string) {
+    return await db.excuteQuery(async (connection) => {
+      const result = await connection.query(
+        `
+        select GetUserPercentileRank(?) as percentage;
+        `,
+        [userId],
+      );
+
+      return result[0];
+    });
+  }
 }
 
 export default TicketModel;
