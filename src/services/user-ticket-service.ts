@@ -16,9 +16,20 @@ class UserTicketService {
     { userId }: UserDto,
     categoryId: number | null,
     limit: number,
-    lastId: number | null,
+    page: number,
   ) {
-    return await this.model.findByUserId(userId, { categoryId }, limit, lastId);
+    let offset = 0;
+    if (limit > 0) {
+      offset = (page - 1) * limit;
+    }
+
+    return await this.model.findByUserId(
+      userId,
+      { categoryId },
+      limit,
+      offset,
+      page,
+    );
   }
 
   async setTicket(

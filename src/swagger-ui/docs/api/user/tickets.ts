@@ -22,9 +22,9 @@ export default {
           },
         },
         {
-          name: 'lastId',
+          name: 'page',
           in: 'query',
-          description: '페이지 당 마지막 id',
+          description: '페이지 수',
           schema: {
             type: 'int',
           },
