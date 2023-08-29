@@ -59,7 +59,7 @@ class UserController {
   @Put('/user/info', auth(UserType.user))
   async updateUserDisplayName(
     @Req('user') user: UserDto,
-    @Body() dto: UpdateUserInfoDto
+    @Body() dto: UpdateUserInfoDto,
   ) {
     const { displayName, password } = dto;
     await this.service.updateUserInfo(user, displayName, password);
@@ -85,12 +85,29 @@ class UserController {
   }
 
   @Post('/user/check-password', auth(UserType.user))
-  async checkPassword(@Req('user') user: UserDto, @Body() dto: CheckPasswordDto) {
+  async checkPassword(
+    @Req('user') user: UserDto,
+    @Body() dto: CheckPasswordDto,
+  ) {
     const result = await this.service.checkPassword(user.userId, dto.password);
 
     return {
-      isCorrect: result
+      isCorrect: result,
     };
+  }
+
+  @Get('/user/statistic', auth(UserType.user))
+  async getUserStatuctuc(
+    @Req('user') user: UserDto,
+    @Query('year') year: number,
+    @Query('month') month: number,
+  ) {
+    return await this.service.getUserStatuctuc(user, year, month);
+  }
+
+  @Get('/user/percentage', auth(UserType.user))
+  async getUserPercentage(@Req('user') user: UserDto) {
+    return await this.service.getUserPercentage(user);
   }
 }
 

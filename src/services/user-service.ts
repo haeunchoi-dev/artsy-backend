@@ -8,7 +8,7 @@ import JWT from '@/libs/jwt';
 import {
   hashPassword,
   comparePassword,
-  generateTempPassword
+  generateTempPassword,
 } from '@/libs/password';
 import mailSender from '@/libs/mailSender';
 
@@ -16,12 +16,16 @@ import { IResDBUser } from '@/types/user';
 import UserModel from '@/models/user-model';
 import UserTempPasswordModel from '@/models/user-temp-password-model';
 import UserDto from '@/dto/user-dto';
+import TicketModel from '@/models/ticket-model';
+import CategoryModel from '@/models/category-model';
 
 @Injectable()
 class UserService {
   constructor(
     private readonly userModel: UserModel,
     private readonly userTempPasswordModel: UserTempPasswordModel,
+    private readonly ticketModel: TicketModel,
+    private readonly categoryModel: CategoryModel,
   ) {}
 
   private async getAccessTokenAndRefreshToken(userId: string) {
@@ -71,7 +75,8 @@ class UserService {
       );
     }
 
-    const { accessToken, refreshToken } = await this.getAccessTokenAndRefreshToken(user.id);
+    const { accessToken, refreshToken } =
+      await this.getAccessTokenAndRefreshToken(user.id);
     return {
       accessToken,
       refreshToken,
@@ -79,7 +84,7 @@ class UserService {
         displayName: user.displayName,
         email: user.email,
         createdDate: user.createdDate,
-      }
+      },
     };
   }
 
@@ -87,7 +92,11 @@ class UserService {
     return await this.userModel.userInfoByUserId(userId);
   }
 
-  async updateUserInfo({ userId }: UserDto, displayName: string, password?: string) {
+  async updateUserInfo(
+    { userId }: UserDto,
+    displayName: string,
+    password?: string,
+  ) {
     let _password = password;
     if (_password) {
       _password = await hashPassword(_password);
@@ -113,7 +122,10 @@ class UserService {
   }
 
   async tempLogin(email: string, password: string) {
-    const users = await this.userTempPasswordModel.findByEmailAndLimitDate(email, 10);
+    const users = await this.userTempPasswordModel.findByEmailAndLimitDate(
+      email,
+      10,
+    );
 
     if (users.length === 0) {
       throw new BadRequestError(
@@ -128,17 +140,18 @@ class UserService {
     });
 
     const results = await Promise.all(promiseList);
-    if (results.every(result => result === false)) {
+    if (results.every((result) => result === false)) {
       throw new BadRequestError(
         ERROR_NAMES.INCORRECT_PASSWORD,
         'tempLogin - incorrect password',
       );
     }
 
-    await this.userTempPasswordModel.deleteByEmail(email)
+    await this.userTempPasswordModel.deleteByEmail(email);
 
     const realUser = (await this.userModel.findByEmail(email))[0];
-    const { accessToken, refreshToken } = await this.getAccessTokenAndRefreshToken(realUser.id);
+    const { accessToken, refreshToken } =
+      await this.getAccessTokenAndRefreshToken(realUser.id);
     return {
       accessToken,
       refreshToken,
@@ -146,7 +159,7 @@ class UserService {
         displayName: realUser.displayName,
         email: realUser.email,
         createdDate: realUser.createdDate,
-      }
+      },
     };
   }
 
@@ -162,6 +175,36 @@ class UserService {
 
     const user = users[0];
     return await comparePassword(password, user.password);
+  }
+
+  async getUserStatuctuc({ userId }: UserDto, year: number, month: number) {
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 1);
+
+    const startDateStr = `${startDate.getFullYear()}-${String(
+      startDate.getMonth() + 1,
+    ).padStart(2, '0')}-${String(startDate.getDate()).padStart(2, '0')}`;
+    const endDateStr = `${endDate.getFullYear()}-${String(
+      endDate.getMonth() + 1,
+    ).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}`;
+
+    const ticketStatuctus = await this.ticketModel.statuctucByUserIdAndDate(
+      userId,
+      startDateStr,
+      endDateStr,
+    );
+
+    const categoryStatuctus = await this.categoryModel.statuctucByUserIdAndDate(
+      userId,
+      startDateStr,
+      endDateStr,
+    );
+
+    return { ...ticketStatuctus, chart: categoryStatuctus };
+  }
+
+  async getUserPercentage({ userId }: UserDto) {
+    return await this.ticketModel.percentageByUserId(userId);
   }
 }
 
