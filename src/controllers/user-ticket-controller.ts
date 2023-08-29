@@ -17,13 +17,13 @@ class UserTicketController {
     @Req('user') user: UserDto,
     @Query('categoryId') categoryId: number,
     @Query('limit', 0) limit: number,
-    @Query('lastId') lastId: number,
+    @Query('page', 1) page: number,
   ) {
     const ticketList = await this.service.getTicketList(
       user,
       categoryId,
       limit,
-      lastId,
+      page,
     );
     return { ...ticketList };
   }
