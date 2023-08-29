@@ -2,6 +2,6 @@
 
 cd "/home/ubuntu/build"
 
-npm install
+sudo npm install
 
 exit 0
