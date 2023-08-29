@@ -44,11 +44,12 @@ class CategoryModel {
         `
         select
           c.name as categoryName,
+          c.color as categoryColor,
           count(t.id) as cnt
         from category c
         LEFT JOIN ticket t ON c.id = t.category_id 
               AND t.user_id  = ? AND show_date >= ? AND show_date < ?
-        group by c.id, c.name
+        group by c.id, c.name, c.color
         `,
         [userId, startDate, endDate],
       );
