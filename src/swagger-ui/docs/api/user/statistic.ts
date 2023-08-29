@@ -57,6 +57,11 @@ export default {
                               description: '카테고리 명',
                               example: '영화',
                             },
+                            categoryColor: {
+                              type: 'string',
+                              description: '카테고리 색',
+                              example: '#8B97FF',
+                            },
                             cnt: {
                               type: 'int',
                               description: '카테고리 별 티켓수',
