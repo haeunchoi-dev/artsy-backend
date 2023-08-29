@@ -70,7 +70,7 @@ class UserModel {
           u.create_date as createdDate,
           count(t.id) as totalTicket
         FROM user u
-        LEFT JOIN ticket t ON t.user_id  = u.id 
+        LEFT JOIN ticket t ON t.user_id  = u.id AND YEAR(t.show_date) = YEAR(CURDATE())
         WHERE u.id = ?
         group by u.display_name, u.email, u.create_date
         `,
@@ -85,15 +85,13 @@ class UserModel {
     await db.excuteQuery(async (connection) => {
       const queryBuilder = new QueryBuilder();
       const query = queryBuilder
-                      .addText('UPDATE user ')
-                      .addSetValue('display_name', displayName)
-                      .addSetValue('password', password)
-                      .addText(`WHERE id = '${userId}'`)
-                      .getQuery();
+        .addText('UPDATE user ')
+        .addSetValue('display_name', displayName)
+        .addSetValue('password', password)
+        .addText(`WHERE id = '${userId}'`)
+        .getQuery();
 
-      await connection.query(
-        query
-      );
+      await connection.query(query);
     });
   }
 
