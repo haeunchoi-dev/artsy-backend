@@ -22,6 +22,7 @@ class TicketModel {
                           c.color as categoryColor, 
                           t.title,
                           t.show_date as showDate,
+                          DATE_FORMAT(t.show_date, '%Y-%m-%d %H:%i') as showDateString,
                           t.place,
                           t.price,
                           t.rating,
@@ -142,6 +143,7 @@ class TicketModel {
                   c.color as categoryColor, 
                   t.title,
                   t.show_date as showDate,
+                  DATE_FORMAT(t.show_date, '%Y-%m-%d %H:%i') as showDateString,
                   t.place,
                   t.price,
                   t.rating,
@@ -179,12 +181,17 @@ class TicketModel {
 
   async update(
     ticketId: number,
-    files:
-      | Express.Multer.File[]
-      | {
-          [fieldname: string]: Express.Multer.File[];
-        },
-    { categoryId, title, showDate, place, price, rating, review }: ITicket,
+    files: IS3ImageFile[],
+    {
+      categoryId,
+      title,
+      showDate,
+      place,
+      price,
+      rating,
+      review,
+      removeFileId,
+    }: ITicket,
   ) {
     return await db.excuteQueryWithTransaction(async (connection) => {
       await connection.query(
@@ -202,7 +209,64 @@ class TicketModel {
         [categoryId, title, showDate, place, price, rating, review, ticketId],
       );
 
-      return { id: ticketId };
+      let deleteFile = [];
+      if (files.length > 0 || removeFileId) {
+        deleteFile = await connection.query(
+          `select id,
+                  ticket_id as ticketId,
+                  image_url as imageUrl,
+                  original_name as originalName,
+                  file_name as fileName,
+                  width,
+                  height,
+                  extension,
+                  file_size as fileSize,
+                  is_primary as isPrimary,
+                  create_date as createDate
+                  from image 
+                  where ticket_id = ?
+                  `,
+          [ticketId],
+        );
+
+        // 기존 파일 삭제
+        await connection.query(`DELETE FROM image WHERE ticket_id = ? `, [
+          ticketId,
+        ]);
+      }
+
+      // 새 파일 추가
+      if (files.length > 0) {
+        let imageQuery = `INSERT INTO image (
+          ticket_id,
+          image_url,
+          original_name,
+          file_name,
+          width,
+          height,
+          extension,
+          file_size,
+          is_primary) VALUES`;
+
+        const imageInsertValues = files.flatMap((f, i) => {
+          imageQuery += ` ${i === 0 ? '' : ','}(?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+          return [
+            ticketId,
+            f.s3Url,
+            f.originalname,
+            f.filename,
+            f.width,
+            f.height,
+            f.mimetype,
+            f.size,
+            i === 0,
+          ];
+        });
+
+        await connection.query(imageQuery, imageInsertValues);
+      }
+
+      return deleteFile;
     });
   }
 
@@ -277,6 +341,41 @@ class TicketModel {
       );
 
       return result;
+    });
+  }
+
+  async statuctucByUserIdAndDate(
+    userId: string,
+    startDate: string,
+    endDate: string,
+  ) {
+    return await db.excuteQuery(async (connection) => {
+      const result = await connection.query(
+        `
+        SELECT 
+          count(id) as cntPerMonth,
+          sum(price) as pricePerMonth
+        FROM ticket
+        WHERE user_id = ?
+          AND show_date >= ? 
+          AND show_date < ?
+        `,
+        [userId, startDate, endDate],
+      );
+      return result[0];
+    });
+  }
+
+  async percentageByUserId(userId: string) {
+    return await db.excuteQuery(async (connection) => {
+      const result = await connection.query(
+        `
+        select GetUserPercentileRank(?) as percentage;
+        `,
+        [userId],
+      );
+
+      return result[0];
     });
   }
 }

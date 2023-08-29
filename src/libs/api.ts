@@ -27,3 +27,27 @@ export const defaultProcess = (requestHandler: RequestHandlerType) => {
     }
   };
 };
+
+const secure = process.env.COOKIE_SECURE === 'true';
+const sameSite = (process.env.COOKIE_SAMESITE as 'none') || 'lax';
+const httpOnly = process.env.COOKIE_HTTPONLY === 'true';
+
+export const setAccessTokenCookie = (res: Response, accessToken: string) => {
+  const cookieOptions = {
+    expires: new Date(Date.now() + 3600000),
+    httpOnly,
+    secure,
+    sameSite,
+  }
+  res.cookie('accessToken', accessToken, cookieOptions);
+}
+
+export const setRefreshTokenCookie = (res: Response, refreshToken: string) => {
+  const cookieOptions = {
+    expires: new Date(Date.now() + 3600000),
+    httpOnly,
+    secure,
+    sameSite,
+  }
+  res.cookie('refreshToken', refreshToken, cookieOptions);
+}

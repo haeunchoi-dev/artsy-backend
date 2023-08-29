@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 import multer, { FileFilterCallback } from 'multer';
 import path from 'path';
+import { v4 as uuidv4 } from 'uuid';
 
 import { ERROR_NAMES, BadRequestError, InternalServerError } from '@/error/errors';
 
@@ -9,7 +10,8 @@ const tempDestination = serverRoot + '/views/uploads/temp';
 
 const generateTempFilename = (originalFileName: string) => {
   const ext = path.extname(originalFileName);
-  return path.basename(originalFileName, ext) + '_' + Date.now() + ext;
+  const uuid = uuidv4();
+  return path.basename(uuid, ext) + ext;
 }
 
 const storage = multer.diskStorage({
