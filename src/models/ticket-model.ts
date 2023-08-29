@@ -8,12 +8,7 @@ import db from '@/db';
 class TicketModel {
   constructor() {}
 
-  async findByUserId(
-    userId: string,
-    filter = {},
-    limit = 0,
-    lastId: number | null,
-  ) {
+  async findByUserId(userId: string, filter = {}, limit = 0, offset = 0,page: number) {
     const transFilter = objectToArray(filter);
 
     let sql = `SELECT     t.id,
@@ -53,14 +48,13 @@ class TicketModel {
       count_sql += ` AND t.${o} = ?`;
     });
 
+    sql += ` order by show_date asc`;
+
     if (limit > 0) {
-      if (lastId) {
-        sql += ` AND t.id > ? order by t.id asc`;
-        transFilter.filterValue.push(lastId);
-      }
-      sql += ` LIMIT ?`;
+      sql += ` LIMIT ? OFFSET ?`;
 
       transFilter.filterValue.push(limit);
+      transFilter.filterValue.push(offset);
     }
 
     return await db.excuteQuery(async (connection) => {
@@ -74,7 +68,7 @@ class TicketModel {
         ...transFilter.filterValue,
       ]);
 
-      return { totalCount: totalCount[0].count, ticketList };
+      return { totalCount: totalCount[0].count, ticketList, page};
     });
   }
 
