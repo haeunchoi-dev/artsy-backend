@@ -1,71 +1,113 @@
 import { Request, Response } from 'express';
+import { setAccessTokenCookie, setRefreshTokenCookie } from '@/libs/api';
 import auth, { UserType } from '@/middlewares/auth';
 import { Injectable } from '@/decorators/di-decorator';
-import { Route } from '@/decorators/route-decorator';
-import checker from '@/libs/checker';
+import { Get, Post, Delete, Put } from '@/decorators/route-decorator';
+import { Body, Query, Param, Req } from '@/decorators/req-binding-decorator';
 
 import UserService from '@/services/user-service';
+import SignupDto from '@/dto/signup-dto';
+import CheckDuplicatedEmailDto from '@/dto/check-duplicated-email-dto';
+import LoginDto from '@/dto/login-dto';
+import UpdateUserInfoDto from '@/dto/update-user-info-dto';
+import PostTempPasswordDto from '@/dto/post-temp-password-dto';
+import TempLoginDto from '@/dto/temp-login-dto';
+import UserDto from '@/dto/user-dto';
+import CheckPasswordDto from '@/dto/check-password-dto';
 
 @Injectable()
 class UserController {
   constructor(private readonly service: UserService) {}
 
-  @Route('post', '/user/sign-up')
-  async signUp(req: Request, res: Response) {
-    const { displayName, email, password } = req.body;
-
-    // TODO dto
-    checker.checkEmailFormat(email);
-    checker.checkRequiredStringParams(displayName, password);
-
+  @Post('/user/sign-up')
+  async signUp(@Body() dto: SignupDto) {
+    const { displayName, email, password } = dto;
     await this.service.signUpWithEmail(displayName, email, password);
   }
 
-  @Route('post', '/user/check-duplicated-email')
-  async checkDuplicatedEmail(req: Request, res: Response) {
-    const { email } = req.body;
-
-    // TODO dto
-    checker.checkEmailFormat(email);
-
+  @Post('/user/check-duplicated-email')
+  async checkDuplicatedEmail(@Body() dto: CheckDuplicatedEmailDto) {
+    const { email } = dto;
     return await this.service.checkDuplicatedEmail(email);
   }
 
-  @Route('post', '/user/login')
-  async login(req: Request, res: Response) {
-    const { email, password } = req.body;
-
-    // TODO dto
-    checker.checkEmailFormat(email);
-    checker.checkRequiredStringParams(password);
+  @Post('/user/login')
+  async login(@Body() dto: LoginDto, res: Response) {
+    const { email, password } = dto;
 
     const result = await this.service.loginWithEmail(email, password);
 
-    const secure = process.env.COOKIE_SECURE === 'true';
-    const sameSite = (process.env.COOKIE_SAMESITE as 'none') || 'lax';
-    const httpOnly = process.env.COOKIE_HTTPONLY === 'true';
-
-    res.cookie('loginToken', result.token, {
-      expires: new Date(Date.now() + 3600000),
-      httpOnly,
-      secure,
-      sameSite,
-    });
+    setAccessTokenCookie(res, result.accessToken);
+    setRefreshTokenCookie(res, result.refreshToken);
 
     return {
       ...result.userInfo,
     };
   }
 
-  @Route('post', '/user/logout', auth(UserType.user))
-  async logout(req: Request, res: Response) {
-    res.clearCookie('loginToken');
+  @Post('/user/logout', auth(UserType.user))
+  async logout(_: Request, res: Response) {
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
   }
 
-  @Route('get', '/user/info', auth(UserType.user))
-  async getUserInfo(req: Request, res: Response) {
-    const userId = req.params.userId;
-    return await this.service.getUserInfo(userId);
+  @Get('/user/info', auth(UserType.user))
+  async getUserInfo(@Req('user') user: UserDto) {
+    return await this.service.getUserInfo(user);
+  }
+
+  @Put('/user/info', auth(UserType.user))
+  async updateUserDisplayName(
+    @Req('user') user: UserDto,
+    @Body() dto: UpdateUserInfoDto,
+  ) {
+    const { displayName, password } = dto;
+    await this.service.updateUserInfo(user, displayName, password);
+  }
+
+  @Post('/user/find-password')
+  async requestTempPassword(@Body() dto: PostTempPasswordDto) {
+    await this.service.requestTempPassword(dto.email);
+  }
+
+  @Post('/user/temp-login')
+  async tempLogin(@Body() dto: TempLoginDto, res: Response) {
+    const { email, password } = dto;
+
+    const result = await this.service.tempLogin(email, password);
+
+    setAccessTokenCookie(res, result.accessToken);
+    setRefreshTokenCookie(res, result.refreshToken);
+
+    return {
+      ...result.userInfo,
+    };
+  }
+
+  @Post('/user/check-password', auth(UserType.user))
+  async checkPassword(
+    @Req('user') user: UserDto,
+    @Body() dto: CheckPasswordDto,
+  ) {
+    const result = await this.service.checkPassword(user.userId, dto.password);
+
+    return {
+      isCorrect: result,
+    };
+  }
+
+  @Get('/user/statistic', auth(UserType.user))
+  async getUserStatuctuc(
+    @Req('user') user: UserDto,
+    @Query('year') year: number,
+    @Query('month') month: number,
+  ) {
+    return await this.service.getUserStatuctuc(user, year, month);
+  }
+
+  @Get('/user/percentage', auth(UserType.user))
+  async getUserPercentage(@Req('user') user: UserDto) {
+    return await this.service.getUserPercentage(user);
   }
 }
 

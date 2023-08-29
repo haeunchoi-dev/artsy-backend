@@ -83,7 +83,7 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     code: errStatusCode,
     message:
       err.appErrorMessage !== undefined
-        ? `${err.name} - ${err.appErrorMessage}`
+        ? `${err.errorName} - ${err.appErrorMessage}`
         : 'Internal server error',
   };
 

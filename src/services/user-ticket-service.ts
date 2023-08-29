@@ -2,16 +2,18 @@ import { Injectable } from '@/decorators/di-decorator';
 import { BadRequestError, ERROR_NAMES, ForbiddenError } from '@/error/errors';
 import TicketModel from '@/models/ticket-model';
 
-import { ITicket } from '@/types/ticket';
-import { IResDBImageFile } from '@/types/image';
+import { IResDBImageFile, IS3ImageFile } from '@/types/image';
 import fileManager from '@/libs/fileManager';
+import TicketDto from '@/dto/ticket-dto';
+
+import UserDto from '@/dto/user-dto';
 
 @Injectable()
 class UserTicketService {
   constructor(private readonly model: TicketModel) {}
 
   async getTicketList(
-    userId: string,
+    { userId }: UserDto,
     categoryId: number | null,
     limit: number,
     lastId: number | null,
@@ -20,11 +22,12 @@ class UserTicketService {
   }
 
   async setTicket(
-    userId: string,
+    { userId }: UserDto,
     files: Express.Multer.File[],
-    { categoryId, title, showDate, place, price, rating, review }: ITicket,
+    { categoryId, title, showDate, place, price, rating, review }: TicketDto,
   ) {
-    const newFiles = await fileManager.convertTempImageToS3Image(files);
+    const newFiles: IS3ImageFile[] =
+      await fileManager.convertTempImageToS3Image(files);
 
     const result = await this.model.create(userId, newFiles, {
       categoryId,
@@ -39,7 +42,7 @@ class UserTicketService {
     return result;
   }
 
-  async getTicket(userId: string, ticketId: number) {
+  async getTicket({ userId }: UserDto, ticketId: number) {
     const ticket = await this.model.findUserIdById(ticketId);
 
     if (ticket.length === 0) {
@@ -57,23 +60,28 @@ class UserTicketService {
     return result;
   }
 
-  async getTicketTotalCount(userId: string) {
+  async getTicketTotalCount({ userId }: UserDto) {
     return await this.model.totalCountByUserId(userId);
   }
 
-  async getTicketTotalPrice(userId: string) {
+  async getTicketTotalPrice({ userId }: UserDto) {
     return await this.model.totalPriceByUserId(userId);
   }
 
   async updateTicket(
-    userId: string,
+    { userId }: UserDto,
     ticketId: number,
-    files:
-      | Express.Multer.File[]
-      | {
-          [fieldname: string]: Express.Multer.File[];
-        },
-    { categoryId, title, showDate, place, price, rating, review }: ITicket,
+    files: Express.Multer.File[],
+    {
+      categoryId,
+      title,
+      showDate,
+      place,
+      price,
+      rating,
+      review,
+      removeFileId,
+    }: TicketDto,
   ) {
     const ticket = await this.model.findUserIdById(ticketId);
 
@@ -88,20 +96,31 @@ class UserTicketService {
       throw new ForbiddenError(ERROR_NAMES.FORBIDDEN, 'not found ticket.');
     }
 
-    const result = await this.model.update(ticketId, files, {
-      categoryId,
-      title,
-      showDate,
-      place,
-      price,
-      rating,
-      review,
-    });
+    const newFiles: IS3ImageFile[] =
+      await fileManager.convertTempImageToS3Image(files);
+
+    const result: IResDBImageFile[] = await this.model.update(
+      ticketId,
+      newFiles,
+      {
+        categoryId,
+        title,
+        showDate,
+        place,
+        price,
+        rating,
+        review,
+        removeFileId,
+      },
+    );
+
+    const deleteFileKeys = result.map((file) => file.fileName);
+    fileManager.deleteS3Files(deleteFileKeys);
 
     return result;
   }
 
-  async deleteTicket(userId: string, ticketId: number) {
+  async deleteTicket({ userId }: UserDto, ticketId: number) {
     const ticket = await this.model.findUserIdById(ticketId);
 
     if (ticket.length === 0) {
@@ -116,7 +135,7 @@ class UserTicketService {
     }
 
     const result: IResDBImageFile[] = await this.model.deleteById(ticketId);
-    const deleteFileKeys = result.map(file => file.fileName);
+    const deleteFileKeys = result.map((file) => file.fileName);
     fileManager.deleteS3Files(deleteFileKeys);
 
     return result;

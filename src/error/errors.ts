@@ -49,9 +49,9 @@ const ERRORS = {
 };
 
 class AppErrorBase extends Error {
-  public appErrorType: string;
-  public serverLog: string | undefined;
-  public appErrorMessage: string;
+  private appErrorType: string;
+  private serverLog: string | undefined;
+  private appErrorMessage: string;
 
   constructor(description: string, serverLog?: string) {
     super(description);
@@ -72,8 +72,8 @@ class AppErrorBase extends Error {
 
 // 잘못된 요청
 export class BadRequestError extends AppErrorBase {
-  public name = 'Bad Request';
-  public statusCode = 400;
+  private errorName = 'Bad Request';
+  private statusCode = 400;
 
   constructor(description: string, serverLog?: string) {
     super(description, serverLog);
@@ -83,8 +83,8 @@ export class BadRequestError extends AppErrorBase {
 
 // 인증 자격 없음
 export class UnauthorizedError extends AppErrorBase {
-  public name = 'Unauthorized';
-  public statusCode = 401;
+  private errorName = 'Unauthorized';
+  private statusCode = 401;
 
   constructor(description: string, serverLog?: string) {
     super(description, serverLog);
@@ -94,8 +94,8 @@ export class UnauthorizedError extends AppErrorBase {
 
 // 접근권한없음
 export class ForbiddenError extends AppErrorBase {
-  public name = 'Forbidden';
-  public statusCode = 403;
+  private errorName = 'Forbidden';
+  private statusCode = 403;
 
   constructor(description: string, serverLog?: string) {
     super(description, serverLog);
@@ -104,8 +104,8 @@ export class ForbiddenError extends AppErrorBase {
 }
 
 export class InternalServerError extends AppErrorBase {
-  public name = 'Internal Server Error';
-  public statusCode = 500;
+  private errorName = 'Internal Server Error';
+  private statusCode = 500;
 
   constructor(description: string, serverLog?: string) {
     super(description, serverLog);

@@ -147,6 +147,11 @@ export default {
                         description: '관람일',
                         example: '2023-08-14',
                       },
+                      showDateString: {
+                        type: 'string',
+                        description: '관람일 toString',
+                        example: '2023-08-14 00:00',
+                      },
                       place: {
                         type: 'string',
                         description: '장소',
@@ -302,6 +307,11 @@ export default {
                     type: 'string',
                     format: 'binary',
                   },
+                },
+                removeFileId: {
+                  type: 'int',
+                  description: '삭제된 file id',
+                  example: 1,
                 },
               },
             },
