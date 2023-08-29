@@ -1,10 +1,5 @@
 #!/bin/bash
 
-if ! command -v pm2 &> /dev/null; then
-    echo "pm2 could not be found. Please install it first."
-    exit 1
-fi
-
 env_source="/home/ubuntu/env"
 build_source="/home/ubuntu/build"
 
