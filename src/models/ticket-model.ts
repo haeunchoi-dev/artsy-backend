@@ -8,7 +8,13 @@ import db from '@/db';
 class TicketModel {
   constructor() {}
 
-  async findByUserId(userId: string, filter = {}, limit = 0, offset = 0,page: number) {
+  async findByUserId(
+    userId: string,
+    filter = {},
+    limit = 0,
+    offset = 0,
+    page: number,
+  ) {
     const transFilter = objectToArray(filter);
 
     let sql = `SELECT     t.id,
@@ -68,7 +74,7 @@ class TicketModel {
         ...transFilter.filterValue,
       ]);
 
-      return { totalCount: totalCount[0].count, ticketList, page};
+      return { totalCount: totalCount[0].count, ticketList, page };
     });
   }
 
@@ -280,7 +286,7 @@ class TicketModel {
   async totalPriceByUserId(userId: string) {
     return db.excuteQuery(async (connection) => {
       const result = await connection.query(
-        `SELECT   sum(price) as totalPrice
+        `SELECT   COALESCE(sum(price),0) as totalPrice
         FROM ticket 
         WHERE user_id = ?`,
         [userId],
@@ -348,7 +354,7 @@ class TicketModel {
         `
         SELECT 
           count(id) as cntPerMonth,
-          sum(price) as pricePerMonth
+          COALESCE(sum(price),0) as pricePerMonth
         FROM ticket
         WHERE user_id = ?
           AND show_date >= ? 
