@@ -366,16 +366,45 @@ class TicketModel {
     });
   }
 
-  async percentageByUserId(userId: string) {
+  async percentageByUserId(userId: string, year: string, nextYear: string) {
     return await db.excuteQuery(async (connection) => {
-      const result = await connection.query(
+      const target = await connection.query(
         `
-        select GetUserPercentileRank(?) as percentage;
+        SELECT COUNT(id) cnt
+        FROM ticket
+        WHERE user_id = ?
+          AND show_date >= ? 
+          AND show_date < ?
         `,
-        [userId],
+        [userId, year, nextYear],
       );
 
-      return result[0];
+      const targetCnt = target[0].cnt;
+
+      const user = await connection.query(
+        `
+        SELECT COUNT(*) cnt
+        FROM (
+            SELECT COUNT(id) AS ticket_count
+            FROM ticket
+            WHERE show_date >= ? 
+              AND show_date < ?
+            GROUP BY user_id
+            HAVING ticket_count >= ?
+        ) as temp
+        `,
+        [year, nextYear, targetCnt],
+      );
+
+      const total = await connection.query(
+        `
+        SELECT COUNT(id) cnt
+          FROM user
+        `,
+        [],
+      );
+
+      return { user: user[0], total: total[0] };
     });
   }
 }
