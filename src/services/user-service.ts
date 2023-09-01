@@ -204,7 +204,19 @@ class UserService {
   }
 
   async getUserPercentage({ userId }: UserDto) {
-    return await this.ticketModel.percentageByUserId(userId);
+    const date = new Date();
+    const now = date.getFullYear();
+    const next = now + 1;
+
+    const year = `${now}-01-01`;
+    const nextYear = `${next}-01-01`;
+    const { user, total } = await this.ticketModel.percentageByUserId(
+      userId,
+      year,
+      nextYear,
+    );
+    const percentage = Math.round((user.cnt / total.cnt) * 100);
+    return { percentage };
   }
 }
 
