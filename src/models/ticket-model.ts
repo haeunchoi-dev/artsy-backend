@@ -12,7 +12,8 @@ class TicketModel {
     userId: string,
     filter = {},
     limit = 0,
-    lastId: number | null,
+    offset = 0,
+    page: number,
   ) {
     const transFilter = objectToArray(filter);
 
@@ -53,14 +54,13 @@ class TicketModel {
       count_sql += ` AND t.${o} = ?`;
     });
 
+    sql += ` order by show_date asc`;
+
     if (limit > 0) {
-      if (lastId) {
-        sql += ` AND t.id > ? order by t.id asc`;
-        transFilter.filterValue.push(lastId);
-      }
-      sql += ` LIMIT ?`;
+      sql += ` LIMIT ? OFFSET ?`;
 
       transFilter.filterValue.push(limit);
+      transFilter.filterValue.push(offset);
     }
 
     return await db.excuteQuery(async (connection) => {
@@ -74,7 +74,7 @@ class TicketModel {
         ...transFilter.filterValue,
       ]);
 
-      return { totalCount: totalCount[0].count, ticketList };
+      return { totalCount: totalCount[0].count, ticketList, page };
     });
   }
 
@@ -286,7 +286,7 @@ class TicketModel {
   async totalPriceByUserId(userId: string) {
     return db.excuteQuery(async (connection) => {
       const result = await connection.query(
-        `SELECT   sum(price) as totalPrice
+        `SELECT   COALESCE(sum(price),0) as totalPrice
         FROM ticket 
         WHERE user_id = ?`,
         [userId],
@@ -354,7 +354,7 @@ class TicketModel {
         `
         SELECT 
           count(id) as cntPerMonth,
-          sum(price) as pricePerMonth
+          COALESCE(sum(price),0) as pricePerMonth
         FROM ticket
         WHERE user_id = ?
           AND show_date >= ? 
@@ -366,16 +366,45 @@ class TicketModel {
     });
   }
 
-  async percentageByUserId(userId: string) {
+  async percentageByUserId(userId: string, year: string, nextYear: string) {
     return await db.excuteQuery(async (connection) => {
-      const result = await connection.query(
+      const target = await connection.query(
         `
-        select GetUserPercentileRank(?) as percentage;
+        SELECT COUNT(id) cnt
+        FROM ticket
+        WHERE user_id = ?
+          AND show_date >= ? 
+          AND show_date < ?
         `,
-        [userId],
+        [userId, year, nextYear],
       );
 
-      return result[0];
+      const targetCnt = target[0].cnt;
+
+      const user = await connection.query(
+        `
+        SELECT COUNT(*) cnt
+        FROM (
+            SELECT COUNT(id) AS ticket_count
+            FROM ticket
+            WHERE show_date >= ? 
+              AND show_date < ?
+            GROUP BY user_id
+            HAVING ticket_count >= ?
+        ) as temp
+        `,
+        [year, nextYear, targetCnt],
+      );
+
+      const total = await connection.query(
+        `
+        SELECT COUNT(id) cnt
+          FROM user
+        `,
+        [],
+      );
+
+      return { user: user[0], total: total[0] };
     });
   }
 }

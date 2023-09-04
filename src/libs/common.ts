@@ -7,7 +7,19 @@ export function getRandomInteger(min: number, max: number) {
 }
 
 export function getRandomLetter(length: number) {
-  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890';
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    const randomNum = getRandomInteger(0, letters.length - 1);
+    result += letters.charAt(randomNum);
+  }
+
+  return result;
+}
+
+export function getRandomSpecialLetter(length: number) {
+  const letters = '!@#$%^&*+=-';
 
   let result = '';
   for (let i = 0; i < length; i++) {
