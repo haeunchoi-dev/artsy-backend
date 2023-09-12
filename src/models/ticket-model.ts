@@ -116,7 +116,7 @@ class TicketModel {
           imageQuery += ` ${i === 0 ? '' : ','}(?, ?, ?, ?, ?, ?, ?, ?, ?)`;
           return [
             ticketId,
-            f.s3Url,
+            '/api/views/uploads/' + f.filename,
             f.originalname,
             f.filename,
             f.width,
@@ -252,7 +252,7 @@ class TicketModel {
           imageQuery += ` ${i === 0 ? '' : ','}(?, ?, ?, ?, ?, ?, ?, ?, ?)`;
           return [
             ticketId,
-            f.s3Url,
+            '/api/views/uploads/' + f.filename,
             f.originalname,
             f.filename,
             f.width,

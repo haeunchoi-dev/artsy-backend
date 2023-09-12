@@ -26,9 +26,10 @@ app.use(cookieParser());
 
 apiRouter(app);
 
+const serverRoot = path.resolve(process.cwd());
 app.use(
-  '/api/views',
-  express.static(path.join(__dirname, 'views/uploads/temp')),
+  '/api/views/uploads',
+  express.static(path.join(serverRoot, 'views/uploads')),
 );
 //swagger 적용
 const { swaggerUI, specs, setUpOption } = getSwaggerOption();
