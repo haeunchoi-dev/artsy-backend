@@ -35,18 +35,18 @@ export default function auth(userType: UserType) {
 
 async function authMember(req: Request, res: Response, next: NextFunction) {
   const { loginToken } = req.cookies;
-  if (
-    loginToken === undefined ||
-    loginToken === null ||
-    loginToken === 'null'
-  ) {
-    throw new UnauthorizedError(
-      ERROR_NAMES.UNAUTHORIZED,
-      'authMember - invalid loginToken',
-    );
-  }
 
   try {
+    if (
+      loginToken === undefined ||
+      loginToken === null ||
+      loginToken === 'null'
+    ) {
+      throw new UnauthorizedError(
+        ERROR_NAMES.UNAUTHORIZED,
+        'authMember - invalid loginToken',
+      );
+    }
     const userInfo = jwt.verify(
       loginToken,
       process.env.TOKEN_SECRET_KEY || 'artsy-secret-key',
@@ -56,17 +56,21 @@ async function authMember(req: Request, res: Response, next: NextFunction) {
     next();
   } catch (error) {
     if (error.name === 'TokenExpiredError') {
-      throw new UnauthorizedError(
-        ERROR_NAMES.UNAUTHORIZED,
-        'authMember - only access member - token expired',
+      next(
+        new UnauthorizedError(
+          ERROR_NAMES.UNAUTHORIZED,
+          'authMember - only access member - token expired',
+        ),
       );
     } else if (error.name === 'JsonWebTokenError') {
-      throw new UnauthorizedError(
-        ERROR_NAMES.UNAUTHORIZED,
-        'authMember - only access member - invalid token',
+      next(
+        new UnauthorizedError(
+          ERROR_NAMES.UNAUTHORIZED,
+          'authMember - only access member - invalid token',
+        ),
       );
     } else {
-      throw error;
+      next(error);
     }
   }
 }
