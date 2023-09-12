@@ -125,8 +125,8 @@ class UserTicketService {
       },
     );
 
-    const deleteFileKeys = result.map((file) => file.fileName);
-    fileManager.deleteS3Files(deleteFileKeys);
+    //const deleteFileKeys = result.map((file) => file.fileName);
+    //fileManager.deleteS3Files(deleteFileKeys);
 
     return result;
   }
@@ -146,8 +146,8 @@ class UserTicketService {
     }
 
     const result: IResDBImageFile[] = await this.model.deleteById(ticketId);
-    const deleteFileKeys = result.map((file) => file.fileName);
-    fileManager.deleteS3Files(deleteFileKeys);
+    //const deleteFileKeys = result.map((file) => file.fileName);
+    //fileManager.deleteS3Files(deleteFileKeys);
 
     return result;
   }

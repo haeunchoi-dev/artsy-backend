@@ -34,6 +34,7 @@ class UserTicketController {
     @Req('files', []) files: Express.Multer.File[],
     @Body() ticketDto: TicketDto,
   ) {
+    console.log(files);
     return await this.service.setTicket(user, files, ticketDto);
   }
 
