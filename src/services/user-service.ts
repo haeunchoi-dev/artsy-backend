@@ -4,7 +4,7 @@ import {
   BadRequestError,
   InternalServerError,
 } from '@/error/errors';
-import JWT from '@/libs/jwt';
+import jwt from 'jsonwebtoken';
 import {
   hashPassword,
   comparePassword,
@@ -27,12 +27,6 @@ class UserService {
     private readonly ticketModel: TicketModel,
     private readonly categoryModel: CategoryModel,
   ) {}
-
-  private async getAccessTokenAndRefreshToken(userId: string) {
-    const accessToken = JWT.getInstance().getSignedAccessToken(userId);
-    const refreshToken = await JWT.getInstance().getSignedRefreshToken(userId);
-    return { accessToken, refreshToken };
-  }
 
   async signUpWithEmail(displayName: string, email: string, password: string) {
     const users = await this.userModel.findByEmail(email);
@@ -75,11 +69,19 @@ class UserService {
       );
     }
 
-    const { accessToken, refreshToken } =
-      await this.getAccessTokenAndRefreshToken(user.id);
+    const secretKey = process.env.TOKEN_SECRET_KEY;
+    if (!secretKey) {
+      throw new InternalServerError(
+        ERROR_NAMES.INTERNAL_SERVER_ERROR,
+        'loginWithEmail - secretKey === undefined',
+      );
+    }
+
+    // TODO Access Token and Refresh Token
+    const token = jwt.sign({ userId: user.id }, secretKey);
+
     return {
-      accessToken,
-      refreshToken,
+      token,
       userInfo: {
         displayName: user.displayName,
         email: user.email,
@@ -150,11 +152,18 @@ class UserService {
     await this.userTempPasswordModel.deleteByEmail(email);
 
     const realUser = (await this.userModel.findByEmail(email))[0];
-    const { accessToken, refreshToken } =
-      await this.getAccessTokenAndRefreshToken(realUser.id);
+    const secretKey = process.env.TOKEN_SECRET_KEY;
+    if (!secretKey) {
+      throw new InternalServerError(
+        ERROR_NAMES.INTERNAL_SERVER_ERROR,
+        'loginWithEmail - secretKey === undefined',
+      );
+    }
+
+    // TODO Access Token and Refresh Token
+    const token = jwt.sign({ userId: realUser.id }, secretKey);
     return {
-      accessToken,
-      refreshToken,
+      token,
       userInfo: {
         displayName: realUser.displayName,
         email: realUser.email,

@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import 'dotenv/config';
 import express, { Request, Response, NextFunction } from 'express';
+import path from 'path';
 import cors from 'cors';
 import logger from 'morgan';
 import cookieParser from 'cookie-parser';
@@ -25,6 +26,10 @@ app.use(cookieParser());
 
 apiRouter(app);
 
+app.use(
+  '/api/views',
+  express.static(path.join(__dirname, 'views/uploads/temp')),
+);
 //swagger 적용
 const { swaggerUI, specs, setUpOption } = getSwaggerOption();
 app.use('/api/api-docs', swaggerUI.serve, swaggerUI.setup(specs, setUpOption));

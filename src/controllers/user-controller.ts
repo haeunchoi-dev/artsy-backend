@@ -37,8 +37,16 @@ class UserController {
 
     const result = await this.service.loginWithEmail(email, password);
 
-    setAccessTokenCookie(res, result.accessToken);
-    setRefreshTokenCookie(res, result.refreshToken);
+    const secure = process.env.COOKIE_SECURE === 'true';
+    const sameSite = (process.env.COOKIE_SAMESITE as 'none') || 'lax';
+    const httpOnly = process.env.COOKIE_HTTPONLY === 'true';
+
+    res.cookie('loginToken', result.token, {
+      expires: new Date(Date.now() + 3600000),
+      httpOnly,
+      secure,
+      sameSite,
+    });
 
     return {
       ...result.userInfo,
@@ -47,8 +55,7 @@ class UserController {
 
   @Post('/user/logout', auth(UserType.user))
   async logout(_: Request, res: Response) {
-    res.clearCookie('accessToken');
-    res.clearCookie('refreshToken');
+    res.clearCookie('loginToken');
   }
 
   @Get('/user/info', auth(UserType.user))
@@ -76,9 +83,16 @@ class UserController {
 
     const result = await this.service.tempLogin(email, password);
 
-    setAccessTokenCookie(res, result.accessToken);
-    setRefreshTokenCookie(res, result.refreshToken);
+    const secure = process.env.COOKIE_SECURE === 'true';
+    const sameSite = (process.env.COOKIE_SAMESITE as 'none') || 'lax';
+    const httpOnly = process.env.COOKIE_HTTPONLY === 'true';
 
+    res.cookie('loginToken', result.token, {
+      expires: new Date(Date.now() + 3600000),
+      httpOnly,
+      secure,
+      sameSite,
+    });
     return {
       ...result.userInfo,
     };

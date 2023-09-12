@@ -4,8 +4,7 @@ import {
   UnauthorizedError,
   InternalServerError,
 } from '@/error/errors';
-import JWT from '@/libs/jwt';
-import { setAccessTokenCookie } from '@/libs/api';
+import jwt from 'jsonwebtoken';
 import UserDto from '@/dto/user-dto';
 
 export enum UserType {
@@ -35,27 +34,39 @@ export default function auth(userType: UserType) {
 }
 
 async function authMember(req: Request, res: Response, next: NextFunction) {
-  const { accessToken, refreshToken } = req.cookies;
+  const { loginToken } = req.cookies;
+  if (
+    loginToken === undefined ||
+    loginToken === null ||
+    loginToken === 'null'
+  ) {
+    throw new UnauthorizedError(
+      ERROR_NAMES.UNAUTHORIZED,
+      'authMember - invalid loginToken',
+    );
+  }
 
   try {
-    if (!accessToken || !refreshToken) {
-      throw new UnauthorizedError(
-        ERROR_NAMES.UNAUTHORIZED,
-        'authMember - invalid tokens',
-      );
-    }
+    const userInfo = jwt.verify(
+      loginToken,
+      process.env.TOKEN_SECRET_KEY || 'artsy-secret-key',
+    ) as { userId: string };
 
-    const { newAccessToken, userId } =
-      await JWT.getInstance().verifyAccessTokenAndRefreshToken(accessToken, refreshToken);
-
-    if (newAccessToken !== undefined) {
-      //console.log('새로운 access token이 존재하여 쿠키에 세팅');
-      setAccessTokenCookie(res, newAccessToken);
-    }
-
-    req.user = new UserDto(userId);
+    req.user = new UserDto(userInfo.userId);
     next();
   } catch (error) {
-    next(error);
+    if (error.name === 'TokenExpiredError') {
+      throw new UnauthorizedError(
+        ERROR_NAMES.UNAUTHORIZED,
+        'authMember - only access member - token expired',
+      );
+    } else if (error.name === 'JsonWebTokenError') {
+      throw new UnauthorizedError(
+        ERROR_NAMES.UNAUTHORIZED,
+        'authMember - only access member - invalid token',
+      );
+    } else {
+      throw error;
+    }
   }
 }
